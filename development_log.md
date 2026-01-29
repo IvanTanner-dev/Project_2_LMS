@@ -53,3 +53,21 @@ Security Logic Verification: Implemented terminal-level debug logging within per
 DRF View Integration: Refactored CourseListCreateView and CourseDetailView to apply these specific permission layers, ensuring the API behaves dynamically based on the user's identity and the request type.
 UI/UX Logic Synchronization: Observed and verified "Security by Absence," where the Django Rest Framework UI automatically hides restricted action forms (PUT/POST) when unauthorized users (student_one) access the endpoint.
 Profile-Based Filtering: Drafted the MyEnrolledCoursesView using get_queryset overrides to provide students with a personalized data feed showing only their active enrollments.
+
+Session 3.1: The Connection Phase
+
+Status: Handshake Successful
+
+Figma Implementation
+Grid Logic: Successfully translated the 12-column Figma layout into Tailwind CSS.
+Component Fidelity: Built a responsive "Course Card" with a dynamic progress bar, hover states, and depth (box-shadows) that matches the original design specs.
+
+Frontend Architecture
+React Structure: Set up a clean App.jsx with a Sidebar/Header/Main layout.
+Dynamic Rendering: Implemented the .map() function to replace static placeholders with a dynamic UI that can handle any number of courses.
+The Courier (Axios): Installed and configured Axios to handle asynchronous data fetching.
+
+The "Handshake" (Cross-Origin Connection)
+CORS Clearance: Configured django-cors-headers on the Backend to allow the React port (5173) to securely request data from the Django port (8000).
+Key Alignment: Verified the JSON payload from Django and re-mapped the React frontend to use the actual database fields (teacher_name, lessons, etc.).
+Fallback Logic: Implemented a try/catch safety net to ensure the UI remains functional (using Mock Data) even if the API is offline.
