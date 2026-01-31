@@ -54,7 +54,7 @@ DRF View Integration: Refactored CourseListCreateView and CourseDetailView to ap
 UI/UX Logic Synchronization: Observed and verified "Security by Absence," where the Django Rest Framework UI automatically hides restricted action forms (PUT/POST) when unauthorized users (student_one) access the endpoint.
 Profile-Based Filtering: Drafted the MyEnrolledCoursesView using get_queryset overrides to provide students with a personalized data feed showing only their active enrollments.
 
-Session 3.1: The Connection Phase
+Session 3.1: The Connection Phase (28/01/26)
 
 Status: Handshake Successful
 
@@ -71,3 +71,15 @@ The "Handshake" (Cross-Origin Connection)
 CORS Clearance: Configured django-cors-headers on the Backend to allow the React port (5173) to securely request data from the Django port (8000).
 Key Alignment: Verified the JSON payload from Django and re-mapped the React frontend to use the actual database fields (teacher_name, lessons, etc.).
 Fallback Logic: Implemented a try/catch safety net to ensure the UI remains functional (using Mock Data) even if the API is offline.
+
+Session 4.1 (29.01.26)
+
+React Routing Integration
+Router Implementation: Successfully wrapped the application in BrowserRouter.
+Dynamic Routing: Established the path="/course/:id" pattern, allowing the app to handle unique URLs for every course in the database.
+Wildcard Resolution: Solved a "No routes matched" error by implementing a path="\*" catch-all, ensuring the Dashboard always loads correctly from the root.
+
+Full-Stack Data Handshake
+Backend Refactor: Updated urls.py to use Class-Based Views (.as_view()), aligning the API roadmap with the CourseDetailView logic.
+Axios Data Fetching: Verified that real data from Django (e.g., "Key Stage 3: Algebra") is successfully flowing into the React state and logging to the console.
+Component Mapping: Updated the Dashboard grid to use Link components, enabling "one-click" navigation from the course list to the detail view.
