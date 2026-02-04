@@ -74,12 +74,14 @@ const CourseCard = ({ course, isEnrolled, onEnroll }) => (
       <div className="mt-4">
         <div className="flex justify-between text-xs mb-1 text-slate-500">
           <span>Progress</span>
-          <span>{course.progress || 0}%</span>
+          {/* 1. Change 'progress' to 'progress_percentage' */}
+          <span>{course.progress_percentage || 0}%</span>
         </div>
         <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
           <div
             className="bg-blue-600 h-full transition-all duration-500"
-            style={{ width: `${course.progress || 0}%` }}
+            /* 2. Change 'progress' to 'progress_percentage' here too */
+            style={{ width: `${course.progress_percentage || 0}%` }}
           ></div>
         </div>
         <Link

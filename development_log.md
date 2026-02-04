@@ -83,3 +83,51 @@ Full-Stack Data Handshake
 Backend Refactor: Updated urls.py to use Class-Based Views (.as_view()), aligning the API roadmap with the CourseDetailView logic.
 Axios Data Fetching: Verified that real data from Django (e.g., "Key Stage 3: Algebra") is successfully flowing into the React state and logging to the console.
 Component Mapping: Updated the Dashboard grid to use Link components, enabling "one-click" navigation from the course list to the detail view.
+
+Session 5 (31.01.26)
+
+Enrollment System & ViewSet Migration
+ViewSet Refactor: Migrated the backend from individual Class-Based Views to a viewsets.ModelViewSet architecture. This unified the logic for listing, retrieving, and custom actions (like enrollment) into a single, clean class.
+Router Implementation: Replaced manual URL paths in api/urls.py with the Django REST Framework DefaultRouter, simplifying the API endpoint structure and future-proofing the routing.
+Custom API Action: Developed a bespoke @action decorator for the enroll endpoint, enabling the Many-To-Many relationship logic that adds a student to a course via a POST request.
+
+Frontend State & User Logic
+Dynamic Enrollment Logic: Implemented is_enrolled logic using a SerializerMethodField. This allows the frontend to instantly know if the logged-in user is a student of the course, enabling the "Join Course" vs. "Continue Lesson" UI toggle.
+Prop-Driven Interactions: Wired the onEnroll function from App.jsx down through the component tree to CourseCard. Verified that clicking "Join Course" triggers an Axios call, re-fetches data, and updates the UI state in real-time.
+ManyToMany Filtering: Resolved a critical NameError and Field Error by refining the get_is_enrolled logic in the Serializer to correctly filter the students list by user.id.
+
+Status Check
+Verified Handshake: Confirmed via browser testing that enrolled courses successfully move from the "Browse Catalog" to the "My Learning" section upon clicking.
+Performance: Audited via Lighthouse, maintaining a high baseline (96 on Best Practices) while scaling the application's complexity.
+
+Session 6: Video Infrastructure & Auth Synchronization (01/02/26)
+
+Schema Evolution: The Video Layer
+Database Migration: Expanded the Lesson model in Django to include a video_url field (URLField).
+Data Integrity: Successfully performed a manual data audit via Django Admin, updating existing lessons with valid YouTube educational links (e.g., "Simplifying Expressions").
+Serializer Extension: Updated LessonSerializer to include video_url in the fields list, ensuring the data packet is accessible to the React frontend.
+
+Frontend Engineering: The Video Player
+Embed Logic Utility: Authored a robust getEmbedUrl utility function using Regular Expressions (Regex).
+Purpose: To automatically convert standard YouTube watch links (which are blocked by browsers in iframes) into "Embed" links that function within the app.
+Edge Case Handling: Cleaned the logic to handle extra URL parameters like timestamps (e.g., &t=4s) and shortened youtu.be links.
+Stateful Lesson Selection: Implemented selectedLesson state in CourseDetail.jsx.
+Logic: Refined the useEffect hook to automatically select the first lesson of a course upon loading, ensuring the video player is never empty.
+Keyed Re-rendering: Applied a key={selectedLesson.id} attribute to the <iframe> component. This forces React to destroy and re-create the player when a student switches lessons, preventing "stale" video content.
+
+Security & Auth Debugging
+JWT Token Forensics: Diagnosed a persistent 401 Unauthorized error ("Given token not valid").
+Technical Discovery: Identified a synchronization gap where the frontend was attempting to fetch private course data using an expired token from Local Storage before the new login handshake was complete.
+Resolution Strategy: Implemented a "Clean Slate" protocol—clearing local storage and ensuring the useEffect only fires when a valid id and token are present.
+
+UI/UX Refinement
+Layout Consolidation: Refactored the Video Player container to remove redundant "placeholder" divs, creating a singular, professional viewing area that toggles between the active video and a "No video available" state.
+Progress Tracking Sync: Verified that the "Progress Bar" and "Lesson List" checkmarks correctly reflect the completion data sent from the backend.
+
+Session 7: (04/02/26)
+
+Frontend: Triggered an action based on user intent.
+Security: Passed a JWT via Axios.
+Backend: Handled a custom @action in a ViewSet.
+Database: Used get_or_create to manage LessonProgress records.
+UI: Reacted instantly to the success message.

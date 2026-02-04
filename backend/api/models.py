@@ -38,11 +38,28 @@ class Lesson(models.Model):
     course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='lessons')
     title = models.CharField(max_length=255)
     content = models.TextField() # This will hold the lesson text
+    video_url = models.URLField(blank=True, null=True, help_text="https://www.youtube.com/watch?v=UVkpH6KWFnk&t=4s")
     order = models.PositiveIntegerField() # To keep lessons in 1, 2, 3 order
 
     def __str__(self):
         return f"{self.course.title} - {self.title}"
     
+    class Meta:
+        ordering = ['order']
+    
+# This links a specific user to a specific lesson
+class LessonProgress(models.Model):
+    user = models.ForeignKey('auth.User', related_name='lesson_progress', on_delete=models.CASCADE)
+    lesson = models.ForeignKey(Lesson, on_delete=models.CASCADE)
+    is_completed = models.BooleanField(default=False)
+    completed_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('user', 'lesson') # One entry per user/lesson combo
+
+    def __str__(self):
+        return f"{self.user.username} - {self.lesson.title} - Completed: {self.is_completed}"
+
 @receiver(post_save, sender=User)
 def create_user_profile(sender, instance, created, **kwargs):
     if created:
