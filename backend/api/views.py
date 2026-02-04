@@ -5,8 +5,8 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
 
-from .models import Course
-from .serializers import CourseSerializer
+from .models import Course, Lesson, LessonProgress
+from .serializers import CourseSerializer, LessonSerializer
 from .permissions import IsTeacherOrReadOnly
 
 # This view handles "GET" (list all) and "POST" (create new)
@@ -46,6 +46,30 @@ class CourseViewSet(viewsets.ModelViewSet):
         # Add the user to the students list
         course.students.add(request.user)
         return Response({"status": "enrolled"}, status=status.HTTP_200_OK)
+    
+    @action(detail=False, methods=['get'], permission_classes=[IsAuthenticated])
+    def enrolled(self, request):
+        # Filter courses where the current user is in the students ManyToMany field
+        courses = Course.objects.filter(students=request.user)
+        serializer = CourseSerializer(courses, many=True, context={'request': request})
+        return Response(serializer.data)
+    
+class LessonViewSet(viewsets.ModelViewSet):
+    queryset = Lesson.objects.all()
+    serializer_class = LessonSerializer
+
+    @action(detail=True, methods=['post'], permission_classes=[IsAuthenticated])
+    def complete(self, request, pk=None):
+        lesson = self.get_object()
+        # Create the progress record if it doesn't exist
+        progress, created = LessonProgress.objects.get_or_create(
+            user=request.user, 
+            lesson=lesson
+        )
+        progress.is_completed = True
+        progress.save()
+        
+        return Response({'status': 'success', 'message': 'Lesson marked as complete'}, status=status.HTTP_200_OK)   
 
 
     

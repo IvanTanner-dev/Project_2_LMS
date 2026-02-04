@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { Route, Routes, Link, Navigate } from "react-router-dom";
-import CourseDetail from "./CourseDetail";
-import Dashboard from "./Dashboard";
+import CourseDetail from "./pages/CourseDetail";
+import Dashboard from "./pages/Dashboard";
 import Login from "./Login";
+import MyCourses from "./pages/MyCourses";
 
 function App() {
   const [courses, setCourses] = useState([]);
@@ -14,6 +15,7 @@ function App() {
   const handleLogout = () => {
     localStorage.removeItem("access_token");
     localStorage.removeItem("refresh_token");
+    setCourses([]); // Clear data so the UI resets
     setIsLoggedIn(false);
   };
 
@@ -21,13 +23,14 @@ function App() {
     const fetchCourses = async () => {
       const token = localStorage.getItem("access_token");
 
-      // If no token exists yet, don't even bother calling the API
-      if (!token) return;
+      if (!token || !isLoggedIn) {
+        console.log("No token found yet, staying in guest mode.");
+        return;
+      }
 
       try {
         const response = await axios.get("http://127.0.0.1:8000/api/courses/", {
           headers: {
-            // IMPORTANT: Ensure there are no extra spaces or typos here
             Authorization: `Bearer ${token}`,
           },
         });
@@ -39,35 +42,6 @@ function App() {
         if (error.response?.status === 401) {
           handleLogout();
         }
-
-        // Fallback to Mock Data so the UI doesn't break
-        const mockData = [
-          {
-            id: 1,
-            title: "Number Theory",
-            level: "Lvl 1",
-            progress: 45,
-            is_enrolled: true, // This puts it in "My Learning"
-            lessons: [],
-          },
-          {
-            id: 2,
-            title: "Advanced Calculus",
-            level: "Lvl 3",
-            progress: 10,
-            is_enrolled: false, // This puts it in "Browse Catalog"
-            lessons: [],
-          },
-          {
-            id: 3,
-            title: "Linear Algebra",
-            level: "Lvl 2",
-            progress: 80,
-            is_enrolled: false,
-            lessons: [],
-          },
-        ];
-        setCourses(mockData);
       }
     };
 
@@ -131,12 +105,13 @@ function App() {
           >
             Dashboard
           </Link>
-          <a
-            href="#"
+
+          <Link
+            to="/my-courses"
             className="block px-4 py-2 rounded hover:bg-slate-800 transition text-white no-underline"
           >
             My Courses
-          </a>
+          </Link>
         </nav>
 
         <div className="p-4 border-t border-slate-800">
@@ -161,13 +136,13 @@ function App() {
 
         <main className="p-8">
           <Routes>
-            <Route path="/" element={<Dashboard courses={courses} />} />
-            <Route path="/course/:id" element={<CourseDetail />} />
-            <Route path="*" element={<Navigate to="/" />} />
             <Route
               path="/"
               element={<Dashboard courses={courses} onEnroll={handleEnroll} />}
             />
+            <Route path="/course/:id" element={<CourseDetail />} />
+            <Route path="*" element={<Navigate to="/" />} />
+            <Route path="/my-courses" element={<MyCourses />} />
           </Routes>
         </main>
       </div>
