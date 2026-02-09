@@ -58,6 +58,7 @@ const Login = ({ setAuth }) => {
           </label>
           <input
             type="password"
+            autoComplete="current-password"
             className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
             value={password}
             onChange={(e) => setPassword(e.target.value)}

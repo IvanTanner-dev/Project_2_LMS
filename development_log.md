@@ -131,3 +131,9 @@ Security: Passed a JWT via Axios.
 Backend: Handled a custom @action in a ViewSet.
 Database: Used get_or_create to manage LessonProgress records.
 UI: Reacted instantly to the success message.
+
+Backend: Resolved JWT 401 Unauthorized errors and verified LessonProgress tracking via Django Shell.
+Logic: Implemented "Smart Lesson Selector" to auto-resume users at their last incomplete lesson.
+Frontend: Refactored CourseDetail into a modular layout with VideoPlayer and SyllabusSidebar.
+UX/UI: Added canvas-confetti celebration and a "Course Complete" overlay with a 1-second delay for maximum impact.
+Outcome: Successfully tested full user flow from enrollment to 100% completion.
