@@ -21,9 +21,9 @@ const VideoPlayer = ({ lesson, onComplete }) => {
   };
 
   return (
-    <div className="flex-1 flex flex-col bg-slate-50 overflow-y-auto">
-      {/* 📺 Video Frame */}
-      <div className="aspect-video bg-black w-full shadow-xl">
+    <div className="flex-1 flex flex-col bg-white">
+      {/* 📺 Video Frame - Removed shadow for a flush look */}
+      <div className="aspect-video bg-black w-full">
         <iframe
           className="w-full h-full"
           src={getEmbedUrl(lesson.video_url)}
@@ -34,16 +34,16 @@ const VideoPlayer = ({ lesson, onComplete }) => {
         ></iframe>
       </div>
 
-      {/* 📝 Lesson Info & Action */}
-      <div className="p-8 max-w-4xl">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 bg-white p-6 rounded-3xl border border-slate-100 shadow-sm">
+      {/* 📝 Lesson Info & Action - Now Flush and Integrated */}
+      <div className="p-6 md:p-8 border-b border-slate-100 bg-slate-50/50">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div>
-            <span className="text-blue-600 font-bold text-xs uppercase tracking-widest">
+            <span className="text-blue-600 font-bold text-[10px] uppercase tracking-[0.2em]">
               Active Lesson
             </span>
-            <h1 className="text-2xl font-bold text-slate-900 mt-1">
+            <h2 className="text-2xl font-extrabold text-slate-900 mt-1">
               {lesson.title}
-            </h1>
+            </h2>
           </div>
 
           <button
@@ -51,11 +51,30 @@ const VideoPlayer = ({ lesson, onComplete }) => {
             disabled={lesson.is_completed}
             className={`px-8 py-4 rounded-2xl font-bold transition-all transform active:scale-95 ${
               lesson.is_completed
-                ? "bg-emerald-50 text-emerald-600 cursor-default border border-emerald-100"
+                ? "bg-emerald-100 text-emerald-700 cursor-default border border-emerald-200"
                 : "bg-blue-600 text-white hover:bg-blue-700 shadow-lg shadow-blue-200"
             }`}
           >
-            {lesson.is_completed ? "✓ Lesson Complete" : "Mark as Complete"}
+            {lesson.is_completed ? (
+              <span className="flex items-center gap-2">
+                <svg
+                  className="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="3"
+                    d="M5 13l4 4L19 7"
+                  />
+                </svg>
+                Lesson Complete
+              </span>
+            ) : (
+              "Mark as Complete"
+            )}
           </button>
         </div>
       </div>
