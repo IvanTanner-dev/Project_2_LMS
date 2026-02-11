@@ -137,3 +137,14 @@ Logic: Implemented "Smart Lesson Selector" to auto-resume users at their last in
 Frontend: Refactored CourseDetail into a modular layout with VideoPlayer and SyllabusSidebar.
 UX/UI: Added canvas-confetti celebration and a "Course Complete" overlay with a 1-second delay for maximum impact.
 Outcome: Successfully tested full user flow from enrollment to 100% completion.
+
+Session 8: (09/02/26)
+
+Resolved Assigned Never Used Errors: Cleaned up Dashboard.jsx by properly mapping derived state (enrolledCourses) and removing ghost variables.
+Dynamic Search Implementation: Wired up a real-time course filter that handles empty states gracefully across both "My Learning" and "Browse Catalog" sections.
+Architectural Semantic Shift: Migrated App.jsx layout from generic <div> wrappers to semantic <main> and <nav> landmarks, drastically improving document outline.
+Lighthouse Optimization:
+
+Accessibility (93/100): Fixed missing form labels, added aria-labels to decorative elements, and corrected heading hierarchy.
+Best Practices (100/100): Achieved a perfect score by ensuring secure link handling and modern browser protocols.
+SEO (91/100): Resolved a critical robots.txt syntax error (removed HTML leak) and implemented a descriptive Meta header.

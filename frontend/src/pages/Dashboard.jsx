@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import CourseCard from "../components/Coursecard";
+import Analytics from "../components/Analytics";
 
 const Dashboard = ({ courses, onEnroll }) => {
   const [searchQuery, setSearchQuery] = useState(""); // 2. Tracking search
@@ -33,7 +34,10 @@ const Dashboard = ({ courses, onEnroll }) => {
         />
       </div>
 
-      {/* 🛠️ ADD THIS BACK: SECTION 1: MY LEARNING */}
+      {/* ANALYTICS SECTION (Added here) */}
+      {courses.length > 0 && <Analytics courses={courses} />}
+
+      {/* SECTION 1: MY LEARNING */}
       {enrolledCourses.length > 0 && (
         <section>
           <h1 className="text-3xl font-black text-slate-900 mb-6">
