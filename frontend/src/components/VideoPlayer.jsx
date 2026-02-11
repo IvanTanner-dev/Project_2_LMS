@@ -27,6 +27,7 @@ const VideoPlayer = ({ lesson, onComplete }) => {
         <iframe
           className="w-full h-full"
           src={getEmbedUrl(lesson.video_url)}
+          data-testid="video-iframe" // 👈 Add this for easy testing
           title={lesson.title}
           frameBorder="0"
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
