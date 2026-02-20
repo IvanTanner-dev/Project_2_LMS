@@ -4,7 +4,8 @@ from rest_framework.views import APIView
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
-
+from rest_framework_simplejwt.views import TokenObtainPairView
+from .serializers import MyTokenObtainPairSerializer
 from .models import Course, Lesson, LessonProgress
 from .serializers import CourseSerializer, LessonSerializer
 from .permissions import IsTeacherOrReadOnly
@@ -70,6 +71,9 @@ class LessonViewSet(viewsets.ModelViewSet):
         progress.save()
         
         return Response({'status': 'success', 'message': 'Lesson marked as complete'}, status=status.HTTP_200_OK)   
+    
+class MyTokenObtainPairView(TokenObtainPairView):
+    serializer_class = MyTokenObtainPairSerializer
 
 
     

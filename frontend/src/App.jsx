@@ -12,10 +12,15 @@ function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(
     !!localStorage.getItem("access_token"),
   );
+  // Initialize user from localStorage so it persists on refresh
+  const [user, setUser] = useState(() => {
+    const savedUser = localStorage.getItem("user_info");
+    return savedUser ? JSON.parse(savedUser) : null;
+  });
 
   const handleLogout = () => {
-    localStorage.removeItem("access_token");
-    localStorage.removeItem("refresh_token");
+    localStorage.clear();
+    setUser(null);
     setCourses([]); // Clear data so the UI resets
     setIsLoggedIn(false);
   };
@@ -53,7 +58,10 @@ function App() {
   if (!isLoggedIn) {
     return (
       <Routes>
-        <Route path="/login" element={<Login setAuth={setIsLoggedIn} />} />
+        <Route
+          path="/login"
+          element={<Login setAuth={setIsLoggedIn} setUser={setUser} />}
+        />
         <Route path="*" element={<Navigate to="/login" />} />
       </Routes>
     );
@@ -95,12 +103,21 @@ function App() {
         <header className="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-8 sticky top-0 z-10">
           <h2 className="text-lg font-medium">Student Dashboard</h2>
           <div className="flex items-center gap-4">
-            <span className="text-sm text-gray-500 font-medium">Ivan T.</span>
+            <span className="text-sm text-gray-500 font-medium">
+              {user ? `${user.first_name} ${user.last_name?.[0]}.` : "Guest"}
+            </span>
             <div
-              className="w-10 h-10 bg-gradient-to-tr from-blue-500 to-indigo-600 rounded-full border-2 border-white shadow-sm"
+              className="w-10 h-10 bg-gradient-to-tr from-blue-500 to-indigo-600 rounded-full border-2 border-white shadow-sm flex items-center justify-center text-white text-sm font-bold"
               role="img"
               aria-label="User Avatar"
-            ></div>
+            >
+              {user
+                ? (
+                    user.first_name[0] +
+                    (user.last_name ? user.last_name[0] : "")
+                  ).toUpperCase()
+                : "G"}
+            </div>
           </div>
         </header>
 
@@ -108,7 +125,15 @@ function App() {
           <Routes>
             <Route
               path="/"
-              element={<Dashboard courses={courses} onEnroll={handleEnroll} />}
+              element={
+                <Dashboard
+                  courses={courses}
+                  onEnroll={handleEnroll}
+                  studentName={
+                    user ? `${user.first_name} ${user.last_name}` : "Student"
+                  }
+                />
+              }
             />
             <Route path="/course/:id" element={<CourseDetail />} />
             <Route path="*" element={<Navigate to="/" />} />

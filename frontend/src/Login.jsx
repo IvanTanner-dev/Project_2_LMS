@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
-const Login = ({ setAuth }) => {
+const Login = ({ setAuth, setUser }) => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -19,8 +19,8 @@ const Login = ({ setAuth }) => {
       // Store the tokens in LocalStorage so the browser remembers them
       localStorage.setItem("access_token", response.data.access);
       localStorage.setItem("refresh_token", response.data.refresh);
-
-      // Update the app state and go to dashboard
+      localStorage.setItem("user_info", JSON.stringify(response.data.user));
+      setUser(response.data.user);
       setAuth(true);
       navigate("/");
     } catch (error) {

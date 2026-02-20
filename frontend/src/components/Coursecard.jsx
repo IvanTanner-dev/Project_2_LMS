@@ -4,7 +4,7 @@ import jsPDF from "jspdf";
 import CertificateTemplate from "./CertificateTemplate";
 import html2canvas from "html2canvas";
 
-const CourseCard = ({ course, isEnrolled, onEnroll }) => {
+const CourseCard = ({ course, isEnrolled, onEnroll, studentName }) => {
   const isCompleted = course.progress_percentage === 100;
   const enrolledStatus = isEnrolled ?? course.is_enrolled;
   const downloadCertificate = async () => {
@@ -107,13 +107,11 @@ const CourseCard = ({ course, isEnrolled, onEnroll }) => {
       {enrolledStatus ? (
         <div className="space-y-3 mt-6">
           {" "}
-          {/* Added a wrapper for spacing */}
-          {/* 🏆 THE NEW BIT */}
           {isCompleted && (
             <>
               <CertificateTemplate
                 id={`cert-${course.id}`}
-                studentName="Ivan"
+                studentName={studentName}
                 courseTitle={course.title}
               />
               <button

@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from .models import Course, Lesson, LessonProgress
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
 class LessonSerializer(serializers.ModelSerializer):
     is_completed = serializers.SerializerMethodField()
@@ -72,3 +73,16 @@ class CourseSerializer(serializers.ModelSerializer):
         
         # Calculate percentage: (Part / Whole) * 100
         return int((completed_lessons / total_lessons) * 100)
+    
+class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
+    def validate(self, attrs):
+        # This calls the parent class to get the standard tokens (access & refresh)
+        data = super().validate(attrs)
+        
+        # This adds a new dictionary key 'user' to the JSON response
+        data['user'] = {
+            'first_name': self.user.first_name,
+            'last_name': self.user.last_name,
+            'username': self.user.username,
+        }
+        return data

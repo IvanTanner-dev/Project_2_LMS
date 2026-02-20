@@ -9,7 +9,8 @@
 
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from .views import CourseViewSet, LessonViewSet
+from .views import CourseViewSet, LessonViewSet, MyTokenObtainPairView
+from rest_framework_simplejwt.views import TokenRefreshView
 
 router = DefaultRouter()
 router.register(r'courses', CourseViewSet)
@@ -17,5 +18,10 @@ router.register(r'lessons', LessonViewSet)
 
 urlpatterns = [
     path('', include(router.urls)),
+    # NEW: Custom Login endpoint that returns the User's name
+    path('token/', MyTokenObtainPairView.as_view(), name='token_obtain_pair'),
+    
+    # Standard endpoint to refresh the token
+    path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 ]
 
