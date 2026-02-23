@@ -175,3 +175,24 @@ Status Check: 100% Pass Rate
 
 Final Tally: Achieved 18/18 passing tests across 9 test files, covering all major pages and utility functions.
 Deployment Readiness: Successfully executed a git push of the verified test suite, establishing a "Green" baseline for all future feature development.
+
+Session 10: Transition the backend from "functional" to "verified" by implementing a robust automated testing suite and resolving architectural discrepancies between the mental logic map and the Django implementation. (23/02/26)
+
+Backend Testing Suite (4/4 Passing): Successfully implemented APITestCase to verify the four pillars of the LMS:
+Teacher Security: Confirmed is_staff requirements for course creation.
+Student Restriction: Validated 403 Forbidden responses for unauthorized write attempts.
+Relational Integrity: Verified LessonProgress tracking via the Many-to-Many relationship.
+API Handshake: Confirmed the /enroll/ custom action successfully updates the database state.
+
+Model Refinement: Resolved ImportError issues by aligning test logic with the LessonProgress through-model rather than a standalone Enrollment table.
+Documentation: Drafted "Technical Challenges" focusing on the JWT Interceptor logic and React Lifecycle management (the "Stale Content" fix).
+
+Technical Challenges Overcome
+The "Permission Paradox": Fixed a logical flaw where authenticated students were accidentally granted teacher-level creation privileges. Resolved this by overriding get_permissions in the ViewSet.
+Database Synchronization: Implemented .refresh_from_db() in test methods to ensure Python variables correctly reflected the SQL updates during many-to-many operations.
+
+Current Status
+Frontend Tests: 18/18 Passing.
+Backend Tests: 4/4 Passing.
+Architecture: Stable.
+Project Confidence: High.

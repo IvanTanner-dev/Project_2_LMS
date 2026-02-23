@@ -39,8 +39,23 @@ class CourseViewSet(viewsets.ModelViewSet):
     queryset = Course.objects.all()
     serializer_class = CourseSerializer
     # This allows guests to see courses but requires login to Enroll
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    def get_permissions(self):
+        """
+        Logic: 
+        1. To Create/Update/Delete: Must be a Teacher (Staff).
+        2. To Enroll/View Enrolled: Must be logged in (Student).
+        3. To List/Retrieve: Anyone can see.
+        """
+        if self.action in ['create', 'update', 'partial_update', 'destroy']:
+            return [permissions.IsAdminUser()] # Only is_staff=True
+        if self.action in ['enroll', 'enrolled']:
+            return [permissions.IsAuthenticated()]
+        return [permissions.AllowAny()]
 
+    def perform_create(self, serializer):
+        # This maps the 'teacher' field in your Model to the logged-in user
+        serializer.save(teacher=self.request.user)
+    
     @action(detail=True, methods=['post'], permission_classes=[IsAuthenticated])
     def enroll(self, request, pk=None):
         course = self.get_object()

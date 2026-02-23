@@ -7,7 +7,7 @@ class LessonSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Lesson
-        fields = ['id', 'title', 'content', 'video_url', 'order', 'is_completed']
+        fields = ['id', 'course', 'title', 'content', 'video_url', 'order', 'is_completed']
     
     def get_is_completed(self, obj):
         user = self.context.get('request').user
@@ -20,9 +20,9 @@ class LessonSerializer(serializers.ModelSerializer):
         return False
 
 class CourseSerializer(serializers.ModelSerializer):
-    # This nested serializer allows us to see lessons inside the course data
     lessons = LessonSerializer(many=True, read_only=True)
-    teacher_name = serializers.ReadOnlyField(source='teacher.username')
+    # Using full name for the teacher if available
+    teacher_name = serializers.SerializerMethodField()
     is_enrolled = serializers.SerializerMethodField()
     progress_percentage = serializers.SerializerMethodField()
 
@@ -32,6 +32,7 @@ class CourseSerializer(serializers.ModelSerializer):
             'id', 
             'title', 
             'description', 
+            'teacher',
             'teacher_name', 
             'lessons', 
             'students',
@@ -39,21 +40,15 @@ class CourseSerializer(serializers.ModelSerializer):
             'progress_percentage',
             'created_at'
             ]
+        read_only_fields = ['teacher', 'students']
     
+    def get_teacher_name(self, obj):
+        return f"{obj.teacher.first_name} {obj.teacher.last_name}".strip() or obj.teacher.username
+
     def get_is_enrolled(self, obj):
-        # We grab the user from the 'request' which is passed by the View
         request = self.context.get('request')
         if request and hasattr(request, "user") and request.user.is_authenticated:
-            # Check if the user is in the 'students' ManyToMany relationship for this course
-            # Note: This assumes your Course model has a relationship with User or Student
-            try:
-
-                return obj.students.filter(id=request.user.id).exists()
-            
-            except Exception as e:
-                
-                print(f"DEBUG ERROR: {e}") # This will show the real error in your terminal
-                return False
+            return obj.students.filter(id=request.user.id).exists()
         return False
     
     def get_progress_percentage(self, obj):
@@ -62,8 +57,7 @@ class CourseSerializer(serializers.ModelSerializer):
             return 0
         
         total_lessons = obj.lessons.count()
-        if total_lessons == 0:
-            return 0
+        if total_lessons == 0: return 0
             
         completed_lessons = LessonProgress.objects.filter(
             user=request.user, 
@@ -71,18 +65,18 @@ class CourseSerializer(serializers.ModelSerializer):
             is_completed=True
         ).count()
         
-        # Calculate percentage: (Part / Whole) * 100
         return int((completed_lessons / total_lessons) * 100)
     
 class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
     def validate(self, attrs):
-        # This calls the parent class to get the standard tokens (access & refresh)
         data = super().validate(attrs)
         
-        # This adds a new dictionary key 'user' to the JSON response
+        # We grab the role from the Profile model we created
+        # user.profile exists because of your @receiver signal!
         data['user'] = {
             'first_name': self.user.first_name,
             'last_name': self.user.last_name,
             'username': self.user.username,
+            'role': self.user.profile.role, # 👈 CRITICAL: Tells React if user is a teacher
         }
         return data

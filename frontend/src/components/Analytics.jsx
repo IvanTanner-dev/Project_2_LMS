@@ -14,8 +14,11 @@ import {
 const Analytics = ({ courses }) => {
   // 1. Map the progress using the correct key: progress_percentage
   const progressData = courses.map((course) => ({
-    name: course.title.substring(0, 8),
-    // Use the exact key from your console log
+    name:
+      course.title.length > 12
+        ? course.title.substring(0, 12) + "..."
+        : course.title,
+    fullTitle: course.title,
     progress: Number(course.progress_percentage) || 0,
   }));
 
@@ -43,7 +46,12 @@ const Analytics = ({ courses }) => {
           Course Mastery
         </h3>
         {/* REMOVED ResponsiveContainer - Using fixed width for testing */}
-        <BarChart width={350} height={250} data={progressData}>
+        <BarChart
+          width={400}
+          height={300}
+          data={progressData}
+          margin={{ top: 20, right: 30, left: 20, bottom: 70 }}
+        >
           <CartesianGrid
             strokeDasharray="3 3"
             vertical={false}
@@ -54,9 +62,29 @@ const Analytics = ({ courses }) => {
             fontSize={10}
             axisLine={false}
             tickLine={false}
+            interval={0} // 👈 Forces all labels to show
+            angle={-10} // 👈 Tilts labels to fit more text
+            textAnchor="end" // 👈 Aligns tilted text correctly
+            height={60} // 👈 Gives the tilted text room to breathe
           />
           <YAxis domain={[0, 100]} hide />
-          <Tooltip contentStyle={{ borderRadius: "12px", border: "none" }} />
+
+          {/* 2. Custom Tooltip to show the FULL name on hover */}
+          <Tooltip
+            labelFormatter={(label, payload) => {
+              // Check if we have the payload from the hovered bar
+              if (payload && payload.length > 0) {
+                return payload[0].payload.fullTitle;
+              }
+              return label;
+            }}
+            contentStyle={{
+              borderRadius: "12px",
+              border: "none",
+              boxShadow: "0 10px 15px -3px rgba(0,0,0,0.1)",
+            }}
+          />
+
           <Bar dataKey="progress" fill="#3B82F6" radius={[4, 4, 0, 0]} />
         </BarChart>
       </div>
@@ -81,9 +109,9 @@ const Analytics = ({ courses }) => {
               data={pieData}
               cx="50%" // Explicitly center horizontally
               cy="50%" // Explicitly center vertically
-              innerRadius={60}
-              outerRadius={80}
-              paddingAngle={5}
+              innerRadius={0}
+              outerRadius={120}
+              paddingAngle={0}
               dataKey="value"
               nameKey="name"
               stroke="none"

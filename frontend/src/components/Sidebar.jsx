@@ -1,8 +1,23 @@
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
 
-const Sidebar = ({ handleLogout, courses }) => {
+const NAV_ITEMS = [
+  { name: "Dashboard", path: "/", icon: "🏠" },
+  { name: "My Courses", path: "/my-courses", icon: "📚" },
+];
+
+const Sidebar = ({ handleLogout, courses, user }) => {
   const location = useLocation();
+  const isTeacher = user?.role === "teacher";
+  let currentNav = [...NAV_ITEMS];
+  // Add Teacher link if applicable
+  if (isTeacher) {
+    currentNav.push({
+      name: "Teacher Portal",
+      path: "/instructor",
+      icon: "👨‍🏫",
+    });
+  }
 
   // 2. Calculate Global Progress (Average of all enrolled courses)
   const enrolledCourses = courses.filter(
@@ -17,11 +32,6 @@ const Sidebar = ({ handleLogout, courses }) => {
       ? Math.round(totalProgress / enrolledCourses.length)
       : 0;
 
-  const navItems = [
-    { name: "Dashboard", path: "/", icon: "🏠" },
-    { name: "My Courses", path: "/my-courses", icon: "📚" },
-  ];
-
   return (
     <div className="w-64 bg-slate-900 h-screen p-6 text-white flex flex-col fixed left-0 top-0">
       <div className="text-2xl font-black tracking-tighter mb-10 text-blue-500">
@@ -33,7 +43,7 @@ const Sidebar = ({ handleLogout, courses }) => {
       </p>
 
       <nav className="space-y-2 flex-1">
-        {navItems.map((item) => {
+        {currentNav.map((item) => {
           const isSelected = location.pathname === item.path;
           return (
             <Link

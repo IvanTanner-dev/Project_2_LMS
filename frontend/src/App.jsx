@@ -6,6 +6,8 @@ import Dashboard from "./pages/Dashboard";
 import Login from "./Login";
 import MyCourses from "./pages/MyCourses";
 import Sidebar from "./components/Sidebar";
+import InstructorDashboard from "./pages/InstructorDashboard";
+import LessonEditor from "./pages/LessonEditor";
 
 function App() {
   const [courses, setCourses] = useState([]);
@@ -95,7 +97,7 @@ function App() {
     <div className="flex min-h-screen bg-gray-50 font-sans text-gray-900">
       {/* SIDEBAR */}
       <nav aria-label="Main Navigation">
-        <Sidebar handleLogout={handleLogout} courses={courses} />
+        <Sidebar handleLogout={handleLogout} courses={courses} user={user} />
       </nav>
 
       {/* MAIN CONTENT AREA */}
@@ -104,19 +106,21 @@ function App() {
           <h2 className="text-lg font-medium">Student Dashboard</h2>
           <div className="flex items-center gap-4">
             <span className="text-sm text-gray-500 font-medium">
-              {user ? `${user.first_name} ${user.last_name?.[0]}.` : "Guest"}
+              {user?.first_name
+                ? `${user.first_name} ${user.last_name ? user.last_name[0] + "." : ""}`
+                : user?.username}
             </span>
             <div
               className="w-10 h-10 bg-gradient-to-tr from-blue-500 to-indigo-600 rounded-full border-2 border-white shadow-sm flex items-center justify-center text-white text-sm font-bold"
               role="img"
               aria-label="User Avatar"
             >
-              {user
+              {user?.first_name
                 ? (
                     user.first_name[0] +
                     (user.last_name ? user.last_name[0] : "")
                   ).toUpperCase()
-                : "G"}
+                : (user?.username ? user.username[0] : "U").toUpperCase()}
             </div>
           </div>
         </header>
@@ -130,7 +134,9 @@ function App() {
                   courses={courses}
                   onEnroll={handleEnroll}
                   studentName={
-                    user ? `${user.first_name} ${user.last_name}` : "Student"
+                    user?.first_name
+                      ? `${user.first_name} ${user.last_name}`
+                      : user?.username || "Student"
                   }
                 />
               }
@@ -138,6 +144,24 @@ function App() {
             <Route path="/course/:id" element={<CourseDetail />} />
             <Route path="*" element={<Navigate to="/" />} />
             <Route path="/my-courses" element={<MyCourses />} />
+            {/* 👨‍🏫 TEACHER ONLY ROUTE */}
+            {user?.role === "teacher" && (
+              <>
+                <Route
+                  path="/instructor"
+                  element={
+                    <InstructorDashboard
+                      courses={courses}
+                      setCourses={setCourses}
+                    />
+                  }
+                />
+                <Route
+                  path="/instructor/course/:courseId/lessons"
+                  element={<LessonEditor />}
+                />
+              </>
+            )}
           </Routes>
         </main>
       </div>
