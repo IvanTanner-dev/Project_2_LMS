@@ -1,5 +1,6 @@
+from django.contrib.auth.models import User
 from rest_framework import serializers
-from .models import Course, Lesson, LessonProgress
+from .models import Course, Lesson, LessonProgress, Profile
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
 class LessonSerializer(serializers.ModelSerializer):
@@ -80,3 +81,43 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
             'role': self.user.profile.role, # 👈 CRITICAL: Tells React if user is a teacher
         }
         return data
+    
+class ProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Profile
+        fields = ['role']
+
+class AdminUserEditSerializer(serializers.ModelSerializer):
+    profile = ProfileSerializer() # Nested serializer
+
+    class Meta:
+        model = User
+        fields = ['id', 'username', 'email', 'first_name', 'last_name', 'profile']
+        read_only_fields = ['username'] # Usually better not to change usernames
+
+    def update(self, instance, validated_data):
+        # 1. Handle the Profile data
+        profile_data = validated_data.pop('profile', None)
+        if profile_data:
+            profile = instance.profile
+            profile.role = profile_data.get('role', profile.role)
+            profile.save()
+
+        # 2. Handle the User data
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        instance.save()
+        
+        return instance
+
+class UserUpdateSerializer(serializers.ModelSerializer):
+    """Used for Student Registration and basic Profile updates"""
+    class Meta:
+        model = User
+        fields = ['id', 'username', 'email', 'password', 'first_name', 'last_name']
+        extra_kwargs = {'password': {'write_only': True}} # 🛡️ Security: Never send password back
+
+    def create(self, validated_data):
+        # This hashes the password so the user can actually log in
+        user = User.objects.create_user(**validated_data)
+        return user

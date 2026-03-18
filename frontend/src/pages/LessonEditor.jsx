@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
-import axios from "axios";
+import api from "../api";
 
 const LessonEditor = () => {
   const { courseId } = useParams();
@@ -15,14 +15,8 @@ const LessonEditor = () => {
   // 1. Fetch current lessons
   useEffect(() => {
     const fetchLessons = async () => {
-      const token = localStorage.getItem("access_token");
       try {
-        const res = await axios.get(
-          `http://127.0.0.1:8000/api/courses/${courseId}/`,
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          },
-        );
+        const res = await api.get(`/api/courses/${courseId}/`);
         setLessons(res.data.lessons || []);
       } catch (err) {
         console.error("Error fetching lessons:", err);
@@ -34,18 +28,13 @@ const LessonEditor = () => {
   // 2. Handle adding a new lesson
   const handleAddLesson = async (e) => {
     e.preventDefault();
-    const token = localStorage.getItem("access_token");
     try {
-      const res = await axios.post(
-        "http://127.0.0.1:8000/api/lessons/",
-        {
-          course: Number(courseId),
-          title: newLesson.title,
-          content: newLesson.content,
-          order: lessons.length + 1,
-        },
-        { headers: { Authorization: `Bearer ${token}` } },
-      );
+      const res = await api.post("/api/lessons/", {
+        course: Number(courseId),
+        title: newLesson.title,
+        content: newLesson.content,
+        order: lessons.length + 1,
+      });
       setLessons([...lessons, res.data]);
       setNewLesson({ title: "", content: "", video_url: "", order: 1 });
     } catch (err) {
@@ -56,11 +45,8 @@ const LessonEditor = () => {
   // 3. Handle deleting a lesson
   const handleDeleteLesson = async (lessonId) => {
     if (!window.confirm("Delete this lesson?")) return;
-    const token = localStorage.getItem("access_token");
     try {
-      await axios.delete(`http://127.0.0.1:8000/api/lessons/${lessonId}/`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      await api.delete(`/api/lessons/${lessonId}/`);
       setLessons(lessons.filter((l) => l.id !== lessonId));
     } catch (err) {
       console.error("Delete failed:", err);

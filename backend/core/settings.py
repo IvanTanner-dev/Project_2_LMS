@@ -25,8 +25,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-n#w(728*0-7c2h60+jyt&(0pje)k1^4v+o4qult3y*=+8-_8i6')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-#DEBUG = os.environ.get('DEBUG', 'False') == 'True'
-DEGUG = True
+# Default to True for local dev; set `DEBUG=False` in production env.
+DEBUG = os.environ.get("DEBUG", "True").lower() in ("1", "true", "yes", "on")
 
 ALLOWED_HOSTS = ['*']
 
@@ -131,7 +131,18 @@ STORAGES = {
     },
 }
 
-CORS_ALLOW_ALL_ORIGINS = True # Only for development!
+def _env_csv(name: str, default: list[str] | None = None) -> list[str]:
+    raw = os.environ.get(name, "")
+    if not raw:
+        return default or []
+    return [item.strip() for item in raw.split(",") if item.strip()]
+
+
+# Only for development! Prefer setting `CORS_ALLOW_ALL_ORIGINS=False` in production.
+CORS_ALLOW_ALL_ORIGINS = (
+    os.environ.get("CORS_ALLOW_ALL_ORIGINS", "True").lower()
+    in ("1", "true", "yes", "on")
+)
 
 # Where to go after a successful login
 LOGIN_REDIRECT_URL = '/api/courses/'
@@ -139,10 +150,13 @@ LOGIN_REDIRECT_URL = '/api/courses/'
 # Where to go after logging out
 LOGOUT_REDIRECT_URL = '/api-auth/login/'
 
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:5173",
-    "http://127.0.0.1:5173",
-]
+CORS_ALLOWED_ORIGINS = _env_csv(
+    "CORS_ALLOWED_ORIGINS",
+    default=[
+        "http://localhost:5173",
+        "http://127.0.0.1:5173",
+    ],
+)
 
 # Django REST Framework Settings
 REST_FRAMEWORK = {
@@ -155,9 +169,3 @@ REST_FRAMEWORK = {
     ],
 }
 
-# Static files (CSS, JavaScript, Images)
-STATIC_URL = 'static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-
-# This enables WhiteNoise's compression and caching support
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'

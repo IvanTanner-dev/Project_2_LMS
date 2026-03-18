@@ -1,14 +1,15 @@
 from django.shortcuts import get_object_or_404
-from rest_framework import viewsets, status, permissions
+from rest_framework import viewsets, status, permissions, generics
 from rest_framework.views import APIView
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
+from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly, AllowAny
 from rest_framework_simplejwt.views import TokenObtainPairView
-from .serializers import MyTokenObtainPairSerializer
+from .serializers import MyTokenObtainPairSerializer, UserUpdateSerializer
 from .models import Course, Lesson, LessonProgress
-from .serializers import CourseSerializer, LessonSerializer
+from .serializers import CourseSerializer, LessonSerializer, AdminUserEditSerializer
 from .permissions import IsTeacherOrReadOnly
+from django.contrib.auth.models import User
 
 # This view handles "GET" (list all) and "POST" (create new)
 # class CourseListCreateView(generics.ListCreateAPIView):
@@ -22,18 +23,18 @@ from .permissions import IsTeacherOrReadOnly
 #     serializer_class = CourseSerializer
 #     permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsTeacherOrReadOnly] # Updated permissions
 
-class EnrollCourseView(APIView):
-    permission_classes = [permissions.IsAuthenticated] # Must be logged in to enroll
+# class EnrollCourseView(APIView):
+#     permission_classes = [permissions.IsAuthenticated] # Must be logged in to enroll
 
-    def post(self, request, pk):
-        course = get_object_or_404(Course, pk=pk)
+#     def post(self, request, pk):
+#         course = get_object_or_404(Course, pk=pk)
         
-        # Check if student is already enrolled
-        if request.user in course.students.all():
-            return Response({"message": "Already enrolled"}, status=status.HTTP_400_BAD_REQUEST)
+#         # Check if student is already enrolled
+#         if request.user in course.students.all():
+#             return Response({"message": "Already enrolled"}, status=status.HTTP_400_BAD_REQUEST)
             
-        course.students.add(request.user)
-        return Response({"message": "Successfully enrolled"}, status=status.HTTP_200_OK)
+#         course.students.add(request.user)
+#         return Response({"message": "Successfully enrolled"}, status=status.HTTP_200_OK)
     
 class CourseViewSet(viewsets.ModelViewSet):
     queryset = Course.objects.all()
@@ -89,6 +90,28 @@ class LessonViewSet(viewsets.ModelViewSet):
     
 class MyTokenObtainPairView(TokenObtainPairView):
     serializer_class = MyTokenObtainPairSerializer
+
+class AdminUserViewSet(viewsets.ModelViewSet):
+    """
+    Endpoints:
+    GET /api/admin/users/          -> List all users
+    GET /api/admin/users/{id}/     -> Get one user
+    PATCH /api/admin/users/{id}/   -> Update user + profile role
+    """
+    queryset = User.objects.all()
+    serializer_class = AdminUserEditSerializer
+    permission_classes = [permissions.IsAdminUser] # Strictly only for is_staff=True
+
+class RegisterView(generics.CreateAPIView):
+    queryset = User.objects.all()
+    permission_classes = [AllowAny]
+    serializer_class = UserUpdateSerializer # Ensure this handles 'password' correctly
+
+    def perform_create(self, serializer):
+        # Hash the password properly before saving
+        user = serializer.save()
+        user.set_password(self.request.data.get('password'))
+        user.save()
 
 
     

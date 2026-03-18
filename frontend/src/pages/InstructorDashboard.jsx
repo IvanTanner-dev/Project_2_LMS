@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import axios from "axios";
+import api from "../api";
 import { Link } from "react-router-dom";
 
 const InstructorDashboard = ({ courses, setCourses }) => {
@@ -13,16 +13,9 @@ const InstructorDashboard = ({ courses, setCourses }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
-    const token = localStorage.getItem("access_token");
 
     try {
-      const response = await axios.post(
-        "http://127.0.0.1:8000/api/courses/",
-        formData,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        },
-      );
+      const response = await api.post("/api/courses/", formData);
 
       // Add the new course to our local state so it appears immediately
       setCourses([...courses, response.data]);
@@ -30,7 +23,7 @@ const InstructorDashboard = ({ courses, setCourses }) => {
       // Reset the form
       setFormData({ title: "", description: "" });
       setShowForm(false);
-      alert("Course created successfully! 🎓");
+      alert("Course created successfully!");
     } catch (error) {
       console.error("Error creating course:", error.response?.data);
       alert("Failed to create course. Check the console for details.");
@@ -101,7 +94,7 @@ const InstructorDashboard = ({ courses, setCourses }) => {
         </form>
       )}
 
-      {/* COURSE LIST (The part that was deleted) */}
+      {/* COURSE LIST */}
       <div className="grid grid-cols-1 gap-4">
         {myCourses.length > 0 ? (
           myCourses.map((course) => (

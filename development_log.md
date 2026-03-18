@@ -196,3 +196,27 @@ Frontend Tests: 18/18 Passing.
 Backend Tests: 4/4 Passing.
 Architecture: Stable.
 Project Confidence: High.
+
+Session 11: Deploying the LMS to Production on Render (02/03/26)
+
+Successful Deployment: Connected GitHub repository to Render and went Live at project-2-lms.onrender.com.
+Database Migration: Successfully ran python manage.py migrate on the remote PostgreSQL database (moving from local SQLite to cloud Postgres).
+Superuser Creation: Implemented a create_admin.py automation script to bypass terminal restrictions in the cloud, allowing first-time Admin access.
+Static File Management: Resolved a 500 Internal Server Error on the local server by running collectstatic to generate the missing staticfiles/ directory.
+
+Challenges Overcome
+The "Port Scan Timeout" (502 Error): Fixed a startup crash by ensuring the gunicorn start command correctly pointed to core.wsgi:application.
+The "Separate Database" Reality: Confirmed that local data does not automatically sync to the cloud; established a manual data export workflow.
+Windows Encoding Conflict: Identified a UnicodeDecodeError (UTF-16 vs UTF-8) when exporting data via PowerShell; found the fix using the --output flag in Django.
+
+Next Steps (The "To-Do" List)
+[ ] Finalize Data Import: Re-run dumpdata --output all_data.json locally and push to Render to populate the live site.
+[ ] Security Cleanup: Remove the create_admin.py script and the loaddata command from Render settings once the database is populated.
+[ ] Environment Variables: Double-check that DEBUG is set to False for the live environment.
+
+Session 12: The Great API Alignment: From Backend Locks to Frontend Freedom (04/03/26)
+
+Fixed: Resolved ImportError and NameError by correctly linking User and Profile serializers.
+Added: Created AdminUserViewSet for frontend-based user management.
+Added: Created RegisterView with password hashing logic.
+Cleaned: Refactored urls.py to use a consistent /api/ prefix and DRF Routers.

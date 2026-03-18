@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import api from "./api";
+import { Link, useNavigate } from "react-router-dom";
 
 const Login = ({ setAuth, setUser }) => {
   const [username, setUsername] = useState("");
@@ -11,7 +11,7 @@ const Login = ({ setAuth, setUser }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post("http://127.0.0.1:8000/api/token/", {
+      const response = await api.post("/api/token/", {
         username,
         password,
       });
@@ -72,6 +72,16 @@ const Login = ({ setAuth, setUser }) => {
           Login to LMS
         </button>
       </form>
+
+      <p className="mt-6 text-center text-gray-600">
+        New here?{" "}
+        <Link
+          to="/register"
+          className="text-blue-600 font-semibold hover:underline"
+        >
+          Create an account
+        </Link>
+      </p>
     </div>
   );
 };

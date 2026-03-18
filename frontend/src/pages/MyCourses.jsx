@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
 import { Link } from "react-router-dom";
 import CourseCard from "../components/Coursecard";
+import api from "../api";
 
 const MyCourses = () => {
   const [courses, setCourses] = useState([]);
@@ -9,19 +9,8 @@ const MyCourses = () => {
 
   useEffect(() => {
     const fetchMyCourses = async () => {
-      const token = localStorage.getItem("access_token");
-
-      if (!token) {
-        setLoading(false);
-        return;
-      }
       try {
-        const response = await axios.get(
-          "http://127.0.0.1:8000/api/courses/enrolled/",
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          },
-        );
+        const response = await api.get("/api/courses/enrolled/");
         setCourses(response.data);
       } catch (err) {
         console.error("Error fetching enrolled courses", err);

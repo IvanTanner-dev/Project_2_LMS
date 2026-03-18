@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
-import axios from "axios";
+import api from "../api";
 import SyllabusSidebar from "../components/SyllabusSidebar";
 import VideoPlayer from "../components/VideoPlayer";
 import { fireConfetti } from "../utils/confetti";
@@ -12,46 +12,24 @@ const CourseDetail = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const token = localStorage.getItem("access_token");
-
-    console.log("URL ID from Params:", id);
-    console.log("Token Found:", !!token);
-
-    // Guard 1: Don't fetch if we don't have a token
-    if (!token || !id) {
-      console.error("Missing ID or Token! Cannot fetch.");
-      return;
-    }
+    if (!id) return;
 
     const fetchCourseData = async () => {
       try {
-        const response = await axios.get(
-          `http://127.0.0.1:8000/api/courses/${id}/`,
-          { headers: { Authorization: `Bearer ${token}` } },
-        );
+        const response = await api.get(`/api/courses/${id}/`);
 
-        // 1. Store the raw data in a local variable
         const freshData = response.data;
-        console.log("FRESH DATA ARRIVED:", freshData);
-
-        // 2. Update the main course state
         setCourse(freshData);
 
-        // 3. SMART LESSON SELECTOR
         if (freshData.lessons && freshData.lessons.length > 0) {
-          // Look for the first lesson where is_completed is false/null
           const nextIncomplete = freshData.lessons.find(
             (lesson) => !lesson.is_completed,
           );
 
           if (nextIncomplete) {
             setSelectedLesson(nextIncomplete);
-            console.log("RESUMING AT:", nextIncomplete.title);
           } else {
-            // If ALL are complete, go back to the first lesson so the player isn't empty
             setSelectedLesson(freshData.lessons[0]);
-            console.log("COURSE COMPLETE: Restarting view at beginning.");
-            // Optionally, fire confetti here to celebrate course completion
             fireConfetti();
           }
         }
@@ -63,29 +41,14 @@ const CourseDetail = () => {
     };
 
     fetchCourseData();
-  }, [id]); // Keep id here so it refetches when you change courses
+  }, [id]);
 
   const markLessonComplete = async () => {
     if (!selectedLesson) return;
 
-    // 1. Grab the token right now
-    const token = localStorage.getItem("access_token");
-
     try {
-      const response = await axios.post(
-        `http://127.0.0.1:8000/api/lessons/${selectedLesson.id}/complete/`,
-        {}, // Empty body
-        {
-          headers: {
-            // 🚨 DOUBLE CHECK THE SPACE: "Bearer "
-            Authorization: `Bearer ${token}`,
-          },
-        },
-      );
+      await api.post(`/api/lessons/${selectedLesson.id}/complete/`);
 
-      console.log("Backend Success:", response.data);
-
-      // 2. Update local state so UI changes immediately
       setCourse((prevCourse) => ({
         ...prevCourse,
         lessons: prevCourse.lessons.map((lesson) =>
@@ -95,14 +58,28 @@ const CourseDetail = () => {
         ),
       }));
 
-      // 3. Move to the next video
       handleNextLesson();
     } catch (err) {
       console.error("Error marking lesson complete:", err);
-      // If it's a 401, you might need to re-login
       if (err.response?.status === 401) {
         alert("Session expired. Please log in again.");
       }
+    }
+  };
+
+  const handleNextLesson = () => {
+    if (!course || !selectedLesson) return;
+
+    const currentIndex = course.lessons.findIndex(
+      (l) => l.id === selectedLesson.id,
+    );
+
+    if (currentIndex !== -1 && currentIndex < course.lessons.length - 1) {
+      const nextLesson = course.lessons[currentIndex + 1];
+      setSelectedLesson(nextLesson);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    } else {
+      fireConfetti();
     }
   };
 
@@ -112,44 +89,8 @@ const CourseDetail = () => {
   const progressPercentage =
     totalCount > 0 ? (completedCount / totalCount) * 100 : 0;
 
-  console.log(
-    `Progress: ${completedCount} / ${totalCount} (${Math.round(progressPercentage)}%)`,
-  );
-
   if (loading) return <div className="p-10">Loading your lessons...</div>;
   if (!course) return <div className="p-8">Loading course details...</div>;
-
-  console.log("1. Full Course Object from API:", course);
-  console.log("2. Currently Selected Lesson:", selectedLesson);
-
-  const handleNextLesson = () => {
-    if (!course || !selectedLesson) return;
-
-    // Find the index of the current lesson
-    const currentIndex = course.lessons.findIndex(
-      (l) => l.id === selectedLesson.id,
-    );
-
-    // Check if there is a lesson after this one
-    if (currentIndex !== -1 && currentIndex < course.lessons.length - 1) {
-      const nextLesson = course.lessons[currentIndex + 1];
-      setSelectedLesson(nextLesson);
-
-      // Smoothly scroll the player back to the top
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    } else {
-      // 1. Start the party immediately!
-      fireConfetti();
-
-      // 2. Wait 1 second (1000ms) for maximum confetti impact,
-      // then trigger the blue screen state.
-      setTimeout(() => {
-        // If you have a state for the overlay, set it here
-        // setShowCompletionOverlay(true);
-        console.log("Showing Blue Screen now...");
-      }, 1000);
-    }
-  };
   return (
     <div className="max-w-7xl mx-auto px-4 py-6">
       {/* BREADCRUMB */}

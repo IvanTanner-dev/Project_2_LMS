@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
-import { Route, Routes, Link, Navigate } from "react-router-dom";
+import api from "./api";
+import Register from "./components/Register";
+import { Route, Routes, Navigate } from "react-router-dom";
 import CourseDetail from "./pages/CourseDetail";
 import Dashboard from "./pages/Dashboard";
 import Login from "./Login";
@@ -11,52 +12,58 @@ import LessonEditor from "./pages/LessonEditor";
 
 function App() {
   const [courses, setCourses] = useState([]);
-  const [isLoggedIn, setIsLoggedIn] = useState(
-    !!localStorage.getItem("access_token"),
-  );
-  // Initialize user from localStorage so it persists on refresh
+  const [isLoggedIn, setIsLoggedIn] = useState(() => {
+    const token = localStorage.getItem("access_token");
+    return !!token && token !== "undefined";
+  });
+
   const [user, setUser] = useState(() => {
-    const savedUser = localStorage.getItem("user_info");
-    return savedUser ? JSON.parse(savedUser) : null;
+    try {
+      const savedUser = localStorage.getItem("user_info");
+      if (!savedUser || savedUser === "undefined") return null;
+      return JSON.parse(savedUser);
+    } catch {
+      return null;
+    }
   });
 
   const handleLogout = () => {
     localStorage.clear();
     setUser(null);
-    setCourses([]); // Clear data so the UI resets
+    setCourses([]);
     setIsLoggedIn(false);
   };
 
+  const handleEnroll = async (courseId) => {
+    try {
+      await api.post(`/api/courses/${courseId}/enroll/`);
+      setCourses((prev) =>
+        prev.map((c) => (c.id === courseId ? { ...c, is_enrolled: true } : c)),
+      );
+    } catch (error) {
+      if (error.response?.status === 401) {
+        handleLogout();
+      } else {
+        console.error("Enroll failed:", error);
+      }
+    }
+  };
+
+  // 1. DATA FETCHING (Side Effects only)
   useEffect(() => {
     const fetchCourses = async () => {
-      const token = localStorage.getItem("access_token");
-
-      if (!token || !isLoggedIn) {
-        console.log("No token found yet, staying in guest mode.");
-        return;
-      }
-
+      if (!isLoggedIn) return;
       try {
-        const response = await axios.get("http://127.0.0.1:8000/api/courses/", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+        const response = await api.get("/api/courses/");
         setCourses(response.data);
       } catch (error) {
-        console.error("API error:", error.response?.status);
-
-        // If the token is dead, clear it and send them back to Login
-        if (error.response?.status === 401) {
-          handleLogout();
-        }
+        if (error.response?.status === 401) handleLogout();
       }
     };
-
     fetchCourses();
-  }, [isLoggedIn]); // Re-runs when user logs in
+  }, [isLoggedIn]);
 
-  // If not logged in, only show the Login page (no sidebar)
+  // 2. AUTH SCREEN (If not logged in, show ONLY Login/Register)
   if (!isLoggedIn) {
     return (
       <Routes>
@@ -64,35 +71,13 @@ function App() {
           path="/login"
           element={<Login setAuth={setIsLoggedIn} setUser={setUser} />}
         />
+        <Route path="/register" element={<Register />} />
         <Route path="*" element={<Navigate to="/login" />} />
       </Routes>
     );
   }
 
-  const handleEnroll = async (courseId) => {
-    const token = localStorage.getItem("access_token");
-    try {
-      // 1. Tell the backend to enroll us
-      await axios.post(
-        `http://127.0.0.1:8000/api/courses/${courseId}/enroll/`,
-        {},
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        },
-      );
-
-      // 2. Immediately re-fetch courses to update the UI
-      const response = await axios.get("http://127.0.0.1:8000/api/courses/", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      setCourses(response.data);
-
-      console.log("Enrollment successful!");
-    } catch (error) {
-      console.error("Enrollment failed:", error);
-    }
-  };
-
+  // 3. MAIN APP (Only reached if isLoggedIn is true)
   return (
     <div className="flex min-h-screen bg-gray-50 font-sans text-gray-900">
       {/* SIDEBAR */}
@@ -144,7 +129,7 @@ function App() {
             <Route path="/course/:id" element={<CourseDetail />} />
             <Route path="*" element={<Navigate to="/" />} />
             <Route path="/my-courses" element={<MyCourses />} />
-            {/* 👨‍🏫 TEACHER ONLY ROUTE */}
+            {/* TEACHER ONLY ROUTE */}
             {user?.role === "teacher" && (
               <>
                 <Route
