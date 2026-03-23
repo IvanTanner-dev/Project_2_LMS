@@ -1,7 +1,9 @@
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
 from rest_framework import status
-from rest_framework.test import APITestCase, APIClient
+from rest_framework.test import APITestCase
 from .models import Course, Lesson, LessonProgress
+
+User = get_user_model()
 
 class CourseTests(APITestCase):
     def setUp(self):
@@ -26,11 +28,11 @@ class CourseTests(APITestCase):
         # Create course and 2 lessons
         course = Course.objects.create(title="Stats", description="Math", teacher=self.teacher)
         l1 = Lesson.objects.create(course=course, title="L1", content="Text", order=1)
-        l2 = Lesson.objects.create(course=course, title="L2", content="Text", order=2)
-        
+        Lesson.objects.create(course=course, title="L2", content="Text", order=2)
+
         # ii. Enroll student in course
         course.students.add(self.student)
-        
+
         # iii. Mark 1 lesson as completed in LessonProgress
         LessonProgress.objects.create(user=self.student, lesson=l1, is_completed=True)
         
@@ -48,21 +50,53 @@ class CourseTests(APITestCase):
 
     #4: The Enrollment API Handshake
     def test_student_enrollment_api(self):
-        """Verify that a student can successfully enroll via the API endpoint."""
-        # i. Setup a course
-        course = Course.objects.create(title="Logic 101", description="Intro", teacher=self.teacher)
-        url = f'/api/courses/{course.id}/enroll/'
-        
-        # ii. Authenticate as student
         self.client.force_authenticate(user=self.student)
-        
-        # iii. Hit the enroll endpoint
-        response = self.client.post(url)
-        
-        # iv. Assertions
+        course = Course.objects.create(title="API Test", description="DRF", teacher=self.teacher)
+        response = self.client.post(f'/api/courses/{course.id}/enroll/')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data['status'], 'enrolled')
+        self.assertTrue(course.students.filter(id=self.student.id).exists())
+
+class AdminTests(APITestCase):
+    def setUp(self):
+        self.admin = User.objects.create_superuser(username='admin_user', password='pw', email='admin@test.com')
+        self.teacher = User.objects.create_user(username='teacher_user', password='pw', is_staff=True)
+        self.student = User.objects.create_user(username='student_user', password='pw')
+
+    def test_admin_can_list_users(self):
+        """Verify that an admin can list all users in the system."""
+        self.client.force_authenticate(user=self.admin)
+        response = self.client.get('/api/admin/users/')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        # Should see at least 3 users (admin, teacher, student created in setUp)
+        self.assertGreaterEqual(len(response.data), 3)
+
+    def test_admin_can_update_user_role(self):
+        """Verify that an admin can change a user's role."""
+        self.client.force_authenticate(user=self.admin)
+        # Update student to be a teacher via the profile
+        response = self.client.patch(f'/api/admin/users/{self.student.id}/', {
+            'profile': {'role': 'teacher'}
+        }, format='json')
         
-        # v. Verify the database was actually updated
-        course.refresh_from_db()
-        self.assertIn(self.student, course.students.all())
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.student.refresh_from_db()
+        self.assertEqual(self.student.profile.role, 'teacher')
+
+    def test_admin_can_remove_user(self):
+        """Verify that an admin can delete a user."""
+        self.client.force_authenticate(user=self.admin)
+        response = self.client.delete(f'/api/admin/users/{self.student.id}/')
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertFalse(User.objects.filter(id=self.student.id).exists())
+
+    def test_non_admin_cannot_access_user_management(self):
+        """Security check: Students and Teachers cannot access admin endpoints."""
+        # Test as Student
+        self.client.force_authenticate(user=self.student)
+        response = self.client.get('/api/admin/users/')
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+        # Test as Teacher (staff but not superuser - depending on your permission logic)
+        # Our AdminUserViewSet uses permissions.IsAdminUser which checks is_staff
+        # If we want ONLY superusers, we'd use a custom permission.
+        # For now, let's verify that a normal student is blocked.

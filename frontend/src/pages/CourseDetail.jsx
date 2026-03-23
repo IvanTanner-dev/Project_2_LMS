@@ -106,9 +106,9 @@ const CourseDetail = () => {
         <span className="font-medium text-gray-900">{course.title}</span>
       </nav>
 
-      <div className="grid grid-cols-12 gap-8">
+      <div className="flex flex-col lg:grid lg:grid-cols-12 gap-8">
         {/* LEFT COLUMN: THE ACTION CENTER */}
-        <div className="col-span-12 lg:col-span-8">
+        <div className="w-full lg:col-span-8">
           {/* We use 'relative' here so the Blue Screen stays inside this box */}
           <div className="relative bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
             {/* 1. THE VIDEO PLAYER & MAIN ACTION BUTTON */}
@@ -119,15 +119,17 @@ const CourseDetail = () => {
 
             {/* 2. THE COMPLETION OVERLAY (Only shows at 100%) */}
             {progressPercentage === 100 && (
-              <div className="absolute inset-0 bg-blue-700/95 backdrop-blur-md flex flex-col items-center justify-center text-white z-50 animate-in fade-in zoom-in duration-300">
-                <div className="text-6xl mb-4">🎓</div>
-                <h2 className="text-4xl font-bold mb-2">Course Completed!</h2>
-                <p className="text-blue-100 mb-8 text-lg">
+              <div className="absolute inset-0 bg-blue-700/95 backdrop-blur-md flex flex-col items-center justify-center text-white z-50 animate-in fade-in zoom-in duration-300 text-center px-6">
+                <div className="text-5xl md:text-6xl mb-4">🎓</div>
+                <h2 className="text-3xl md:text-4xl font-bold mb-2">
+                  Course Completed!
+                </h2>
+                <p className="text-blue-100 mb-8 text-base md:text-lg max-w-md mx-auto leading-relaxed">
                   Excellent work on mastering {course.title}
                 </p>
                 <button
                   onClick={() => (window.location.href = "/")}
-                  className="bg-white text-blue-700 px-8 py-3 rounded-full font-bold hover:scale-105 transition-transform shadow-xl"
+                  className="bg-white text-blue-700 px-6 md:px-8 py-3 rounded-full font-bold hover:scale-105 transition-transform shadow-xl text-sm md:text-base"
                 >
                   Return to Dashboard
                 </button>
@@ -160,7 +162,7 @@ const CourseDetail = () => {
         </div>
 
         {/* RIGHT COLUMN: THE SYLLABUS */}
-        <div className="col-span-12 lg:col-span-4">
+        <div className="w-full lg:col-span-4">
           <div className="bg-white rounded-2xl shadow-sm border border-gray-200 sticky top-6 overflow-hidden">
             <div className="p-4 border-b border-gray-100 bg-gray-50/50">
               <h3 className="font-bold text-gray-800">Course Syllabus</h3>

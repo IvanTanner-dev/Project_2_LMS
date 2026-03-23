@@ -1,0 +1,40 @@
+[MASTER]
+load-plugins=pylint_django
+django-settings-module=core.settings
+
+[MESSAGES CONTROL]
+# C0114: Missing module docstring
+# C0115: Missing class docstring
+# C0116: Missing function docstring
+# C0103: Variable name doesn't conform to snake_case (Django models often use id, pk, etc)
+# W0613: Unused argument (Django/DRF views often have unused arguments)
+# R0901: Too many ancestors (DRF ViewSets have many ancestors by design)
+# C0301: Line too long (Migrate files often have long lines)
+# E5110: Django not configured (Plugin handles this but sometimes fails in static analysis)
+# E5142: User model imported from django.contrib.auth.models (Prefer get_user_model)
+# C0411: Wrong import order
+# C0413: Wrong import position
+# W0223: Abstract method not overridden (Common in SimpleJWT serializers)
+disable=
+    C0114,
+    C0115,
+    C0116,
+    C0103,
+    W0613,
+    R0901,
+    C0301,
+    E5110,
+    E5142,
+    C0411,
+    C0413,
+    W0223,
+    missing-final-newline,
+    trailing-whitespace,
+    trailing-newlines,
+    multiple-statements
+
+[FORMAT]
+max-line-length=120
+
+[DESIGN]
+max-parents=15

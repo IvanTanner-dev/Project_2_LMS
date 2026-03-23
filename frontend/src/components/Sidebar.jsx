@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 
 const NAV_ITEMS = [
@@ -6,29 +6,17 @@ const NAV_ITEMS = [
   { name: "My Courses", path: "/my-courses", icon: "📚" },
 ];
 
-const Sidebar = ({ handleLogout, courses, user }) => {
+const Sidebar = ({ handleLogout, courses, user, isOpen, setIsOpen }) => {
   const location = useLocation();
-  const isTeacher = user?.role === "teacher";
-  const [isCompact, setIsCompact] = useState(false);
-  const [isHovered, setIsHovered] = useState(false);
+  // Ensure we check for 'admin' role correctly.
+  // Often admins should also see teacher features.
+  const isAdmin = user?.role === "admin" || user?.username === "admin";
+  const isTeacher = user?.role === "teacher" || isAdmin;
 
+  // Auto-close on route change
   useEffect(() => {
-    const mq = window.matchMedia("(max-width: 500px)");
-
-    const update = () => setIsCompact(mq.matches);
-    update();
-
-    // Safari fallback for older event APIs
-    if (typeof mq.addEventListener === "function") {
-      mq.addEventListener("change", update);
-      return () => mq.removeEventListener("change", update);
-    }
-
-    mq.addListener(update);
-    return () => mq.removeListener(update);
-  }, []);
-
-  const expanded = !isCompact || isHovered;
+    if (setIsOpen) setIsOpen(false);
+  }, [location.pathname, setIsOpen]);
 
   let currentNav = [...NAV_ITEMS];
   // Add Teacher link if applicable
@@ -37,6 +25,15 @@ const Sidebar = ({ handleLogout, courses, user }) => {
       name: "Teacher Portal",
       path: "/instructor",
       icon: "👨‍🏫",
+    });
+  }
+
+  // Add Admin link if applicable
+  if (isAdmin) {
+    currentNav.push({
+      name: "Admin Panel",
+      path: "/admin",
+      icon: "🛡️",
     });
   }
 
@@ -54,54 +51,60 @@ const Sidebar = ({ handleLogout, courses, user }) => {
       : 0;
 
   return (
-    <div
-      className={`bg-slate-900 h-screen text-white flex flex-col fixed left-0 top-0 transition-[width,padding] duration-200 ${
-        expanded ? "w-64 p-6" : "w-16 p-3"
-      }`}
-      onMouseLeave={() => setIsHovered(false)}
-    >
-      <div className="text-2xl font-black tracking-tighter mb-10 text-blue-500 flex items-center">
-        LMS
-        {expanded && <span className="text-white">PRO</span>}
-      </div>
+    <>
+      {/* Backdrop for mobile */}
+      {isOpen && (
+        <div
+          className="fixed inset-0 bg-black/50 z-40 md:hidden backdrop-blur-sm transition-opacity duration-300"
+          onClick={() => setIsOpen(false)}
+        />
+      )}
 
-      {expanded && (
+      <div
+        className={`bg-slate-900 h-screen text-white flex flex-col fixed left-0 top-0 z-50 transition-transform duration-300 md:translate-x-0 md:w-64 p-6 ${
+          isOpen ? "translate-x-0" : "-translate-x-full"
+        }`}
+      >
+        <div className="flex items-center justify-between mb-10">
+          <div className="text-2xl font-black tracking-tighter text-blue-500 flex items-center">
+            LMS<span className="text-white">PRO</span>
+          </div>
+          <button
+            onClick={() => setIsOpen(false)}
+            className="md:hidden text-slate-400 hover:text-white"
+            aria-label="Close menu"
+          >
+            ✕
+          </button>
+        </div>
+
         <p className="text-slate-200 text-[10px] font-bold uppercase tracking-[0.2em] mb-4">
           Menu
         </p>
-      )}
 
-      <nav className="space-y-2 flex-1">
-        {currentNav.map((item) => {
-          const isSelected = location.pathname === item.path;
-          return (
-            <Link
-              key={item.name}
-              to={item.path}
-              aria-label={item.name}
-              title={item.name}
-              className={`flex items-center rounded-xl font-semibold transition-all duration-200 py-3 ${
-                expanded
-                  ? "gap-3 px-4 justify-start"
-                  : "gap-0 px-0 justify-center"
-              } ${
-                isSelected
-                  ? "bg-blue-600 text-white shadow-lg shadow-blue-900/40"
-                  : "text-slate-300 hover:text-white hover:bg-slate-800"
-              }`}
-              onMouseEnter={() => {
-                if (isCompact) setIsHovered(true);
-              }}
-            >
-              <span aria-hidden="true">{item.icon}</span>
-              {expanded && <span>{item.name}</span>}
-            </Link>
-          );
-        })}
-      </nav>
+        <nav className="space-y-2 flex-1">
+          {currentNav.map((item) => {
+            const isSelected = location.pathname === item.path;
+            return (
+              <Link
+                key={item.name}
+                to={item.path}
+                aria-label={item.name}
+                title={item.name}
+                className={`flex items-center rounded-xl font-semibold transition-all duration-200 py-3 gap-3 px-4 justify-start ${
+                  isSelected
+                    ? "bg-blue-600 text-white shadow-lg shadow-blue-900/40"
+                    : "text-slate-300 hover:text-white hover:bg-slate-800"
+                }`}
+              >
+                <span aria-hidden="true">{item.icon}</span>
+                <span>{item.name}</span>
+              </Link>
+            );
+          })}
+        </nav>
 
-      {/* 📊 GLOBAL PROGRESS WIDGET */}
-      {expanded && (
+        {/* GLOBAL PROGRESS WIDGET */}
         <div className="mt-auto mb-6">
           <div className="bg-slate-800 border border-slate-600 rounded-2xl p-4">
             <div className="flex justify-between items-end mb-2">
@@ -125,10 +128,8 @@ const Sidebar = ({ handleLogout, courses, user }) => {
             </p>
           </div>
         </div>
-      )}
 
-      {/* Optional: User Profile Mini-Card at bottom */}
-      {expanded && (
+        {/* Optional: User Profile Mini-Card at bottom */}
         <div className="border-t border-slate-800 pt-6 mt-auto">
           <div className="flex items-center gap-3 px-2">
             <div className="text-sm">
@@ -141,8 +142,8 @@ const Sidebar = ({ handleLogout, courses, user }) => {
             </div>
           </div>
         </div>
-      )}
-    </div>
+      </div>
+    </>
   );
 };
 

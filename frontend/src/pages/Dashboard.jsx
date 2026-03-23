@@ -17,7 +17,7 @@ const Dashboard = ({ courses, onEnroll, studentName }) => {
   );
 
   return (
-    <div className="space-y-12">
+    <div className="space-y-12 p-4 md:p-0">
       {/* 🔍 SEARCH BAR SECTION */}
       <div className="relative max-w-md">
         <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">

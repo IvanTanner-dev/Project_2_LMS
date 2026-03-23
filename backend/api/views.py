@@ -1,15 +1,19 @@
-from django.shortcuts import get_object_or_404
+from django.contrib.auth import get_user_model
 from rest_framework import viewsets, status, permissions, generics
-from rest_framework.views import APIView
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly, AllowAny
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework_simplejwt.views import TokenObtainPairView
-from .serializers import MyTokenObtainPairSerializer, UserUpdateSerializer
+from .serializers import (
+    MyTokenObtainPairSerializer,
+    UserUpdateSerializer,
+    CourseSerializer,
+    LessonSerializer,
+    AdminUserEditSerializer
+)
 from .models import Course, Lesson, LessonProgress
-from .serializers import CourseSerializer, LessonSerializer, AdminUserEditSerializer
-from .permissions import IsTeacherOrReadOnly
-from django.contrib.auth.models import User
+
+User = get_user_model()
 
 # This view handles "GET" (list all) and "POST" (create new)
 # class CourseListCreateView(generics.ListCreateAPIView):
@@ -79,14 +83,17 @@ class LessonViewSet(viewsets.ModelViewSet):
     def complete(self, request, pk=None):
         lesson = self.get_object()
         # Create the progress record if it doesn't exist
-        progress, created = LessonProgress.objects.get_or_create(
-            user=request.user, 
+        progress, _ = LessonProgress.objects.get_or_create(
+            user=request.user,
             lesson=lesson
         )
         progress.is_completed = True
         progress.save()
-        
-        return Response({'status': 'success', 'message': 'Lesson marked as complete'}, status=status.HTTP_200_OK)   
+
+        return Response(
+            {'status': 'success', 'message': 'Lesson marked as complete'},
+            status=status.HTTP_200_OK
+        )
     
 class MyTokenObtainPairView(TokenObtainPairView):
     serializer_class = MyTokenObtainPairSerializer

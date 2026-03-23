@@ -43,7 +43,7 @@ const Analytics = ({ courses }) => {
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
-      {/* 📊 BAR CHART CARD */}
+      {/* BAR CHART CARD */}
       <div className="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm flex flex-col items-center">
         <h3 className="text-sm font-bold text-slate-700 uppercase tracking-widest mb-6 w-full">
           Course Mastery
@@ -92,7 +92,7 @@ const Analytics = ({ courses }) => {
         </div>
       </div>
 
-      {/* 🥧 PIE CHART CARD */}
+      {/* PIE CHART CARD */}
       <div className="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm flex flex-col items-center">
         <h3 className="text-sm font-bold text-slate-700 uppercase tracking-widest mb-6 w-full text-center">
           Learning Distribution
@@ -107,8 +107,8 @@ const Analytics = ({ courses }) => {
                 cx="50%"
                 cy="50%"
                 innerRadius={0}
-                // Slightly smaller on narrow screens since the container width shrinks.
-                outerRadius={120}
+                // Use a smaller fixed value for better control across screen sizes
+                outerRadius={90}
                 paddingAngle={0}
                 dataKey="value"
                 nameKey="name"
@@ -119,7 +119,13 @@ const Analytics = ({ courses }) => {
                   <Cell key={`cell-${index}`} fill={entry.color} />
                 ))}
               </Pie>
-              <Tooltip />
+              <Tooltip
+                contentStyle={{
+                  borderRadius: "12px",
+                  border: "none",
+                  boxShadow: "0 10px 15px -3px rgba(0,0,0,0.1)",
+                }}
+              />
             </PieChart>
           </ResponsiveContainer>
         </div>
