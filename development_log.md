@@ -220,3 +220,10 @@ Fixed: Resolved ImportError and NameError by correctly linking User and Profile 
 Added: Created AdminUserViewSet for frontend-based user management.
 Added: Created RegisterView with password hashing logic.
 Cleaned: Refactored urls.py to use a consistent /api/ prefix and DRF Routers.
+
+Session 13: Infrastructure & Auth (08/03/26)
+
+Architectural Upgrade: Implemented a centralized api.js helper using Axios interceptors to automate JWT header injection.
+Security: Migrated hardcoded backend URLs to .env variables for environment portability.
+Feature Addition: Developed a new User Registration flow and integrated it with the Django REST backend.
+Code Quality: Refactored CourseDetail, InstructorDashboard, and LessonEditor to reduce boilerplate by ~30%.

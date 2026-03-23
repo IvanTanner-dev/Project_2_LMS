@@ -95,7 +95,11 @@ const CourseDetail = () => {
     <div className="max-w-7xl mx-auto px-4 py-6">
       {/* BREADCRUMB */}
       <nav className="mb-6 flex items-center text-sm text-gray-500">
-        <Link to="/" className="hover:text-blue-600 transition-colors">
+        <Link
+          to="/"
+          aria-label="Back to dashboard"
+          className="hover:text-blue-600 transition-colors"
+        >
           Dashboard
         </Link>
         <span className="mx-2">/</span>

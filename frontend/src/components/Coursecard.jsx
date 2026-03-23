@@ -66,7 +66,7 @@ const CourseCard = ({ course, isEnrolled, onEnroll, studentName }) => {
         {enrolledStatus && (
           <div className="flex items-center gap-1">
             {isCompleted ? (
-              <span className="flex items-center gap-1 bg-amber-50 text-amber-600 px-2 py-0.5 rounded border border-amber-100 text-[10px] font-black uppercase">
+              <span className="flex items-center gap-1 bg-amber-100 text-amber-900 px-2 py-0.5 rounded border border-amber-200 text-[10px] font-black uppercase">
                 🏆 Completed
               </span>
             ) : (
@@ -79,9 +79,9 @@ const CourseCard = ({ course, isEnrolled, onEnroll, studentName }) => {
         )}
       </div>
 
-      <h3 className="text-lg font-bold text-slate-800 mb-4 group-hover:text-blue-600 transition">
+      <h2 className="text-lg font-bold text-slate-800 mb-4 group-hover:text-blue-600 transition">
         {course.title}
-      </h3>
+      </h2>
 
       <div className="flex-1">
         {enrolledStatus ? (
@@ -116,7 +116,7 @@ const CourseCard = ({ course, isEnrolled, onEnroll, studentName }) => {
               />
               <button
                 onClick={downloadCertificate}
-                className="w-full py-2 bg-emerald-500 text-white rounded-xl text-sm font-bold hover:bg-emerald-600 transition shadow-lg shadow-emerald-100 flex items-center justify-center gap-2"
+                className="w-full py-2 bg-emerald-700 text-white rounded-xl text-sm font-bold hover:bg-emerald-800 transition shadow-lg shadow-emerald-200 flex items-center justify-center gap-2"
               >
                 🏆 Download Certificate
               </button>
@@ -126,7 +126,7 @@ const CourseCard = ({ course, isEnrolled, onEnroll, studentName }) => {
             to={`/course/${course.id}`}
             className={`block text-center py-2 rounded-xl text-sm font-bold transition no-underline ${
               isCompleted
-                ? "bg-emerald-50 text-emerald-600 hover:bg-emerald-100 border border-emerald-100"
+                ? "bg-emerald-100 text-emerald-900 hover:bg-emerald-200 border border-emerald-200"
                 : "bg-blue-600 text-white hover:bg-blue-700"
             }`}
           >

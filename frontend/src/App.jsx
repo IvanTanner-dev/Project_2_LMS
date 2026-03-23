@@ -86,7 +86,7 @@ function App() {
       </nav>
 
       {/* MAIN CONTENT AREA */}
-      <div className="flex-1 flex flex-col ml-64">
+      <div className="flex-1 flex flex-col ml-64 max-[500px]:ml-16">
         <header className="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-8 sticky top-0 z-10">
           <h2 className="text-lg font-medium">Student Dashboard</h2>
           <div className="flex items-center gap-4">

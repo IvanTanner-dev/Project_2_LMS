@@ -40,9 +40,9 @@ const Dashboard = ({ courses, onEnroll, studentName }) => {
       {/* SECTION 1: MY LEARNING */}
       {enrolledCourses.length > 0 && (
         <section>
-          <h1 className="text-3xl font-black text-slate-900 mb-6">
+          <h2 className="text-3xl font-black text-slate-900 mb-6">
             My Learning
-          </h1>
+          </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {enrolledCourses.map((course) => (
               <CourseCard

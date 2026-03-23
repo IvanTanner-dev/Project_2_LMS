@@ -78,6 +78,8 @@ const LessonEditor = () => {
                 </span>
               </div>
               <button
+                type="button"
+                aria-label="Delete lesson"
                 onClick={() => handleDeleteLesson(lesson.id)}
                 className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
               >
@@ -99,7 +101,7 @@ const LessonEditor = () => {
         onSubmit={handleAddLesson}
         className="bg-slate-50 p-6 rounded-2xl border-2 border-dashed border-slate-200 space-y-4"
       >
-        <h3 className="font-bold text-slate-700">Add New Lesson</h3>
+        <h2 className="font-bold text-slate-700">Add New Lesson</h2>
         <input
           className="w-full p-3 border rounded-xl focus:ring-2 focus:ring-blue-500 outline-none"
           placeholder="Lesson Title"

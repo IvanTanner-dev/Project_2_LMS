@@ -16,7 +16,8 @@ const VideoPlayer = ({ lesson, onComplete }) => {
       /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
     const match = url.match(regExp);
     return match && match[2].length === 11
-      ? `https://www.youtube.com/embed/${match[2]}`
+      // Use the privacy-enhanced domain to reduce tracking/cookie usage.
+      ? `https://www.youtube-nocookie.com/embed/${match[2]}?rel=0&modestbranding=1`
       : url;
   };
 
@@ -29,6 +30,8 @@ const VideoPlayer = ({ lesson, onComplete }) => {
           src={getEmbedUrl(lesson.video_url)}
           data-testid="video-iframe" // 👈 Add this for easy testing
           title={lesson.title}
+          loading="lazy"
+          referrerPolicy="strict-origin-when-cross-origin"
           frameBorder="0"
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
           allowFullScreen
