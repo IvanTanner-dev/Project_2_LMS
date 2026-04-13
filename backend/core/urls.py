@@ -20,12 +20,15 @@ from rest_framework_simplejwt.views import (
     TokenObtainPairView,
     TokenRefreshView,
 )
+from django.http import JsonResponse
+
+def welcome(request):
+    return JsonResponse({"message": "LMS API is live!", "status": "ok"})
 
 urlpatterns = [
+    path('', welcome),
     path('admin/', admin.site.urls),
-    path('api/', include('api.urls')), # Your existing course URLs
-    
-    # NEW: Auth endpoints
+    path('api/', include('api.urls')),  
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 ]

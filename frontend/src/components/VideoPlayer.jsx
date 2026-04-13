@@ -16,8 +16,8 @@ const VideoPlayer = ({ lesson, onComplete }) => {
       /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
     const match = url.match(regExp);
     return match && match[2].length === 11
-      // Use the privacy-enhanced domain to reduce tracking/cookie usage.
-      ? `https://www.youtube-nocookie.com/embed/${match[2]}?rel=0&modestbranding=1`
+      ? // Use the privacy-enhanced domain to reduce tracking/cookie usage.
+        `https://www.youtube-nocookie.com/embed/${match[2]}?rel=0&modestbranding=1`
       : url;
   };
 
@@ -38,7 +38,7 @@ const VideoPlayer = ({ lesson, onComplete }) => {
         ></iframe>
       </div>
 
-      {/* 📝 Lesson Info & Action - Now Flush and Integrated */}
+      {/* Lesson Info & Action - Now Flush and Integrated */}
       <div className="p-6 md:p-8 border-b border-slate-100 bg-slate-50/50">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div>
