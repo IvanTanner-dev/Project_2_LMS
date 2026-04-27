@@ -19,27 +19,27 @@ A sophisticated, full-stack educational platform demonstrating advanced software
 
 ### **Secure Authentication**
 
-![Login Screen](docs\screenshots\recruiter_demo_login.jpg)
+![Login Screen](docs/screenshots/recruiter_demo_login.jpg)
 _Secure JWT-based authentication with role detection_
 
 ### **Student Dashboard**
 
-![Student Dashboard](docs\screenshots\recruiter_demo_page1.jpg)
+![Student Dashboard](docs/screenshots/recruiter_demo_page1.jpg)
 _Personalized learning path and course discovery._
 
 ### **Progress & Analytics**
 
-![Student Progress](docs\screenshots\joe_bloggs_lesson_view2.jpg)
+![Student Progress](docs/screenshots/joe_bloggs_lesson_view2.jpg)
 _Real-time tracking of lesson completion and educational milestones._
 
 ### **Teacher Portal**
 
-![Teacher Portal](docs\screenshots\recruiter_demo_page_Create_Course.jpg)
+![Teacher Portal](docs/screenshots/recruiter_demo_page_Create_Course.jpg)
 _Teacher interface for dynamic course and lesson architecture._
 
 ### **Admin Panel**
 
-![Admin Panel](docs\screenshots\recruiter_demo_admin_panel.jpg)
+![Admin Panel](docs/screenshots/recruiter_demo_admin_panel.jpg)
 _User management and system administration_
 
 ---
