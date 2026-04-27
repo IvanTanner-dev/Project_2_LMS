@@ -22,7 +22,7 @@ class LessonSerializer(serializers.ModelSerializer):
 
 class CourseSerializer(serializers.ModelSerializer):
     lessons = LessonSerializer(many=True, read_only=True)
-    # Using full name for the teacher if available
+    
     teacher_name = serializers.SerializerMethodField()
     is_enrolled = serializers.SerializerMethodField()
     progress_percentage = serializers.SerializerMethodField()
@@ -72,13 +72,11 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
     def validate(self, attrs):
         data = super().validate(attrs)
         
-        # We grab the role from the Profile model we created
-        # user.profile exists because of your @receiver signal!
         data['user'] = {
             'first_name': self.user.first_name,
             'last_name': self.user.last_name,
             'username': self.user.username,
-            'role': self.user.profile.role, # 👈 CRITICAL: Tells React if user is a teacher
+            'role': self.user.profile.role, 
         }
         return data
     
@@ -88,12 +86,12 @@ class ProfileSerializer(serializers.ModelSerializer):
         fields = ['role']
 
 class AdminUserEditSerializer(serializers.ModelSerializer):
-    profile = ProfileSerializer() # Nested serializer
+    profile = ProfileSerializer() 
 
     class Meta:
         model = User
         fields = ['id', 'username', 'email', 'first_name', 'last_name', 'profile']
-        read_only_fields = ['username'] # Usually better not to change usernames
+        read_only_fields = ['username'] 
 
     def update(self, instance, validated_data):
         # 1. Handle the Profile data
@@ -115,9 +113,9 @@ class UserUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['id', 'username', 'email', 'password', 'first_name', 'last_name']
-        extra_kwargs = {'password': {'write_only': True}} # 🛡️ Security: Never send password back
+        extra_kwargs = {'password': {'write_only': True}} 
 
     def create(self, validated_data):
-        # This hashes the password so the user can actually log in
+        
         user = User.objects.create_user(**validated_data)
         return user

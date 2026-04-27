@@ -5,11 +5,10 @@ class IsTeacherRole(permissions.BasePermission):
     Allows access only to users with the 'teacher' role in their profile.
     """
     def has_permission(self, request, view):
-        # We only care about blocking "Write" operations (POST)
+        
         if request.method in permissions.SAFE_METHODS:
             return True
         
-        # Check if the user has a profile and if that role is 'teacher'
         return hasattr(request.user, 'profile') and request.user.profile.role == 'teacher'
 
 class IsTeacherOrReadOnly(permissions.BasePermission):

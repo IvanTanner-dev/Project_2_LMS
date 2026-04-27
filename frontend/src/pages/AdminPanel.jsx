@@ -14,9 +14,8 @@ const AdminPanel = () => {
   const fetchUsers = async () => {
     setLoading(true);
     try {
-      // Assuming there's an endpoint to fetch all users
-      // If not, we'd normally implement this on the backend first
-      const response = await api.get("/api/users/");
+      // Use the correct admin users endpoint
+      const response = await api.get("/api/admin/users/");
       setUsers(response.data);
     } catch (err) {
       console.error("Failed to fetch users:", err);

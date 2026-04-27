@@ -14,32 +14,7 @@ from .serializers import (
 from .models import Course, Lesson, LessonProgress
 
 User = get_user_model()
-
-# This view handles "GET" (list all) and "POST" (create new)
-# class CourseListCreateView(generics.ListCreateAPIView):
-#     queryset = Course.objects.all()
-#     serializer_class = CourseSerializer
-#     permission_classes = [AllowAny] # Updated permissions
-
-# This view handles "GET" (one specific), "PUT" (update), and "DELETE"
-# class CourseDetailView(generics.RetrieveUpdateDestroyAPIView):
-#     queryset = Course.objects.all()
-#     serializer_class = CourseSerializer
-#     permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsTeacherOrReadOnly] # Updated permissions
-
-# class EnrollCourseView(APIView):
-#     permission_classes = [permissions.IsAuthenticated] # Must be logged in to enroll
-
-#     def post(self, request, pk):
-#         course = get_object_or_404(Course, pk=pk)
-        
-#         # Check if student is already enrolled
-#         if request.user in course.students.all():
-#             return Response({"message": "Already enrolled"}, status=status.HTTP_400_BAD_REQUEST)
-            
-#         course.students.add(request.user)
-#         return Response({"message": "Successfully enrolled"}, status=status.HTTP_200_OK)
-    
+ 
 class CourseViewSet(viewsets.ModelViewSet):
     queryset = Course.objects.all()
     serializer_class = CourseSerializer
@@ -52,7 +27,7 @@ class CourseViewSet(viewsets.ModelViewSet):
         3. To List/Retrieve: Anyone can see.
         """
         if self.action in ['create', 'update', 'partial_update', 'destroy']:
-            return [permissions.IsAdminUser()] # Only is_staff=True
+            return [permissions.IsAdminUser()] 
         if self.action in ['enroll', 'enrolled']:
             return [permissions.IsAuthenticated()]
         return [permissions.AllowAny()]

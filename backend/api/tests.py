@@ -96,7 +96,4 @@ class AdminTests(APITestCase):
         response = self.client.get('/api/admin/users/')
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
-        # Test as Teacher (staff but not superuser - depending on your permission logic)
-        # Our AdminUserViewSet uses permissions.IsAdminUser which checks is_staff
-        # If we want ONLY superusers, we'd use a custom permission.
-        # For now, let's verify that a normal student is blocked.
+        

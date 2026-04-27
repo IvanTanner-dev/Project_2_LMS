@@ -21,7 +21,7 @@ class Profile(models.Model):
     def __str__(self):
         return f"{self.user.username} - {self.role}"
 
-# This represents a single Course in your LMS
+# This represents a single Course in LMS
 class Course(models.Model):
     title = models.CharField(max_length=255)
     description = models.TextField()
@@ -39,7 +39,7 @@ class Lesson(models.Model):
     # This links the Lesson to a specific Course
     course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='lessons')
     title = models.CharField(max_length=255)
-    content = models.TextField()  # This will hold the lesson text
+    content = models.TextField()  
     video_url = models.URLField(
         blank=True,
         null=True,
@@ -61,7 +61,7 @@ class LessonProgress(models.Model):
     completed_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        unique_together = ('user', 'lesson')  # One entry per user/lesson combo
+        unique_together = ('user', 'lesson')  
 
     def __str__(self):
         return f"{self.user.username} - {self.lesson.title} - Completed: {self.is_completed}"

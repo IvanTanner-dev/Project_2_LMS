@@ -9,8 +9,8 @@ const InstructorDashboard = ({ courses, setCourses }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedCourseAnalytics, setSelectedCourseAnalytics] = useState(null);
 
-  // Filters the courses to show only yours
-  const myCourses = courses.filter((c) => c.teacher_name === "admin");
+  // Filters the courses to show only yours - Note: course data structure uses 'teacher' field
+  const myCourses = courses.filter((c) => c.teacher === "teacher_ivan");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
