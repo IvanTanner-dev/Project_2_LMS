@@ -7,10 +7,10 @@ const createdApi =
   typeof axios?.create === "function" ? axios.create({ baseURL }) : undefined;
 const api = createdApi && typeof createdApi?.get === "function" ? createdApi : axios;
 
-// Remember to automate the Token injection here later!
+// Establish global authorization logic by injecting JWT tokens into outgoing requests.
 if (api?.interceptors?.request?.use) {
   api.interceptors.request.use((config) => {
-    // Used internally to avoid infinite loops / invalid-header auth on refresh
+    // Avoid recursion or invalid headers during token refresh cycles.
     if (config.skipAuthRefresh) return config;
 
     const token = localStorage.getItem("access_token");
@@ -29,7 +29,7 @@ if (api?.interceptors?.response?.use) {
       const originalRequest = error?.config;
       const status = error?.response?.status;
 
-      // Only try refresh on auth errors we can recover from.
+      // Handle session expiration by attempting an automated token rotation.
       if (status !== 401) return Promise.reject(error);
       if (!originalRequest) return Promise.reject(error);
       if (originalRequest._retry) return Promise.reject(error);
@@ -45,7 +45,7 @@ if (api?.interceptors?.response?.use) {
       originalRequest._retry = true;
 
       try {
-        // Make refresh call without sending the (possibly expired) access token header.
+        // Exchange the persistent refresh token for a new short-lived access token.
         const refreshResponse = await axios.post(
           `${baseURL}/api/token/refresh/`,
           { refresh: refreshToken },

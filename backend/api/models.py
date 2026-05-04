@@ -6,10 +6,10 @@ from django.dispatch import receiver
 User = get_user_model()
 
 class Profile(models.Model):
-    # This links the Profile to a specific User
+    # Extend the default User model with role-specific metadata via a one-to-one relationship.
     user = models.OneToOneField(User, on_delete=models.CASCADE)
 
-    # Define the choices for the role field
+    # Define platform personas to drive role-based access control (RBAC).
     ROLE_CHOICES = [
         ('student', 'Student'),
         ('teacher', 'Teacher'),
@@ -21,13 +21,13 @@ class Profile(models.Model):
     def __str__(self):
         return f"{self.user.username} - {self.role}"
 
-# This represents a single Course in LMS
+# Root entity for educational content, acting as a container for lessons and student enrollments.
 class Course(models.Model):
     title = models.CharField(max_length=255)
     description = models.TextField()
-    # This links the course to a User (Teacher)
+    # Designate the subject matter expert responsible for managing course content.
     teacher = models.ForeignKey(User, on_delete=models.CASCADE)
-    # NEW: This links courses to multiple students
+    # Facilitate multi-student enrollment tracking without duplicating course data.
     students = models.ManyToManyField(User, related_name='enrolled_courses', blank=True)
 
     created_at = models.DateTimeField(auto_now_add=True)
@@ -36,7 +36,7 @@ class Course(models.Model):
         return self.title
 
 class Lesson(models.Model):
-    # This links the Lesson to a specific Course
+    # Associate modular content units with their parent curriculum.
     course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='lessons')
     title = models.CharField(max_length=255)
     content = models.TextField()  
@@ -45,7 +45,8 @@ class Lesson(models.Model):
         null=True,
         help_text="https://www.youtube.com/watch?v=UVkpH6KWFnk&t=4s"
     )
-    order = models.PositiveIntegerField()  # To keep lessons in 1, 2, 3 order
+    # Maintain pedagogical sequence to ensure students follow the intended learning path.
+    order = models.PositiveIntegerField()
 
     def __str__(self):
         return f"{self.course.title} - {self.title}"
@@ -53,7 +54,7 @@ class Lesson(models.Model):
     class Meta:
         ordering = ['order']
 
-# This links a specific user to a specific lesson
+# Track individual student achievements and curriculum progression.
 class LessonProgress(models.Model):
     user = models.ForeignKey(User, related_name='lesson_progress', on_delete=models.CASCADE)
     lesson = models.ForeignKey(Lesson, on_delete=models.CASCADE)

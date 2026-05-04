@@ -158,6 +158,34 @@ npm run dev
 
 ---
 
+## **Production Deployment (Railway.app)**
+
+This project is configured for automated deployment via Railway. Follow these steps to move from local development to production.
+
+### **1. Backend Deployment (Django)**
+
+1. **Connect Repository:** Link your GitHub repo to a new Railway project.
+2. **Database Setup:** Add a **PostgreSQL** database to your Railway project.
+3. **Environment Variables:**
+   - `DEBUG`: `False`
+   - `SECRET_KEY`: (Generate a long random string)
+   - `ALLOWED_HOSTS`: `*` (or your specific domain)
+   - `CORS_ALLOWED_ORIGINS`: `https://your-frontend-domain.up.railway.app`
+   - `DATABASE_URL`: (Automatically provided by Railway's PostgreSQL)
+4. **Build & Start:** Railway will detect the `backend/Procfile` and use it to start the Gunicorn server.
+
+### **2. Frontend Deployment (Vite/React)**
+
+1. **New Service:** Create a new service in the same Railway project.
+2. **Root Directory:** Set the root directory to `frontend/`.
+3. **Environment Variables:**
+   - `VITE_API_BASE_URL`: `https://your-backend-domain.up.railway.app`
+4. **Build Command:** `npm run build`
+5. **Install Command:** `npm install`
+6. **Publish Directory:** `dist`
+
+---
+
 ## **Future Enhancements**
 
 - **Real-time Notifications** with WebSocket integration

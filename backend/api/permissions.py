@@ -13,16 +13,16 @@ class IsTeacherRole(permissions.BasePermission):
 
 class IsTeacherOrReadOnly(permissions.BasePermission):
     def has_object_permission(self, request, view, obj):
-        # Safe methods (GET, HEAD, OPTIONS) are allowed for everyone
+        # Grant read-only access to all users to facilitate curriculum discovery.
         if request.method in permissions.SAFE_METHODS:
             return True
         
-        # 2. Check if the logged-in user is the teacher
+        # Verify resource ownership to prevent unauthorized modifications.
         is_the_teacher = obj.teacher == request.user
 
-        # DEBUG: This will show up in your terminal
+        # Audit: Log permission evaluations to assist in troubleshooting access control issues.
         print(f">>> Permission Check: User={request.user} | Teacher={obj.teacher} | Result={is_the_teacher}")
 
-        # Write permissions are only allowed to the teacher of the course
+        # Enforce strict ownership: only the designated subject matter expert can modify course metadata.
         return is_the_teacher
         

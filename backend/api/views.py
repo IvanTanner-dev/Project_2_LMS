@@ -18,13 +18,13 @@ User = get_user_model()
 class CourseViewSet(viewsets.ModelViewSet):
     queryset = Course.objects.all()
     serializer_class = CourseSerializer
-    # This allows guests to see courses but requires login to Enroll
+    # Define granular access control to balance public visibility with protected actions.
     def get_permissions(self):
         """
-        Logic: 
-        1. To Create/Update/Delete: Must be a Teacher (Staff).
-        2. To Enroll/View Enrolled: Must be logged in (Student).
-        3. To List/Retrieve: Anyone can see.
+        Enforce role-based access control (RBAC):
+        - Staff manage content (CUD).
+        - Students interact with specific course actions (Enroll/View Enrolled).
+        - Anonymous users can browse the catalog.
         """
         if self.action in ['create', 'update', 'partial_update', 'destroy']:
             return [permissions.IsAdminUser()] 
@@ -33,19 +33,19 @@ class CourseViewSet(viewsets.ModelViewSet):
         return [permissions.AllowAny()]
 
     def perform_create(self, serializer):
-        # This maps the 'teacher' field in your Model to the logged-in user
+        # Establish ownership by linking the course record to the authenticated creator.
         serializer.save(teacher=self.request.user)
     
     @action(detail=True, methods=['post'], permission_classes=[IsAuthenticated])
     def enroll(self, request, pk=None):
         course = self.get_object()
-        # Add the user to the students list
+        # Persist the enrollment relationship in the Many-to-Many join table.
         course.students.add(request.user)
         return Response({"status": "enrolled"}, status=status.HTTP_200_OK)
     
     @action(detail=False, methods=['get'], permission_classes=[IsAuthenticated])
     def enrolled(self, request):
-        # Filter courses where the current user is in the students ManyToMany field
+        # Retrieve personalized course lists by checking student membership.
         courses = Course.objects.filter(students=request.user)
         serializer = CourseSerializer(courses, many=True, context={'request': request})
         return Response(serializer.data)
@@ -57,7 +57,7 @@ class LessonViewSet(viewsets.ModelViewSet):
     @action(detail=True, methods=['post'], permission_classes=[IsAuthenticated])
     def complete(self, request, pk=None):
         lesson = self.get_object()
-        # Create the progress record if it doesn't exist
+        # Upsert lesson completion state to ensure data consistency across multiple clicks.
         progress, _ = LessonProgress.objects.get_or_create(
             user=request.user,
             lesson=lesson
@@ -75,10 +75,7 @@ class MyTokenObtainPairView(TokenObtainPairView):
 
 class AdminUserViewSet(viewsets.ModelViewSet):
     """
-    Endpoints:
-    GET /api/admin/users/          -> List all users
-    GET /api/admin/users/{id}/     -> Get one user
-    PATCH /api/admin/users/{id}/   -> Update user + profile role
+    Administrative endpoints for managing system users and their roles.
     """
     queryset = User.objects.all()
     serializer_class = AdminUserEditSerializer
@@ -90,7 +87,7 @@ class RegisterView(generics.CreateAPIView):
     serializer_class = UserUpdateSerializer # Ensure this handles 'password' correctly
 
     def perform_create(self, serializer):
-        # Hash the password properly before saving
+        # Security requirement: apply one-way hashing to the raw password string before persistence.
         user = serializer.save()
         user.set_password(self.request.data.get('password'))
         user.save()

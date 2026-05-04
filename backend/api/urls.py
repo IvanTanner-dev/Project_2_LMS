@@ -9,13 +9,13 @@ from .views import (
 )
 from rest_framework_simplejwt.views import TokenRefreshView
 
-# 1. Setup the Router for ViewSets
+# Initialize the DRF router to automate RESTful endpoint generation for core entities.
 router = DefaultRouter()
 router.register(r'courses', CourseViewSet, basename='course')
 router.register(r'lessons', LessonViewSet, basename='lesson')
 router.register(r'admin/users', AdminUserViewSet, basename='admin-user-management')
 
-# 2. Define URL Patterns
+# Aggregate standard ViewSet routes with custom authentication and identity endpoints.
 urlpatterns = [
     # Router URLs (courses, lessons, admin/users)
     path('', include(router.urls)), 

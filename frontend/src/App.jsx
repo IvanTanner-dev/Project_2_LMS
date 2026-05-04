@@ -63,7 +63,7 @@ function App() {
     return "Dashboard";
   };
 
-  // 1. DATA FETCHING (Side Effects only)
+  // Synchronization: Keep local course state in sync with the backend database.
   useEffect(() => {
     const fetchCourses = async () => {
       if (!isLoggedIn) return;
@@ -77,7 +77,7 @@ function App() {
     fetchCourses();
   }, [isLoggedIn]);
 
-  // 2. AUTH SCREEN (If not logged in, show ONLY Login/Register)
+  // Conditional Layout: Redirect unauthenticated users to the identity gateway.
   if (!isLoggedIn) {
     return (
       <Routes>
@@ -91,10 +91,10 @@ function App() {
     );
   }
 
-  // 3. MAIN APP (Only reached if isLoggedIn is true)
+  // Protected Shell: Render the core application layout once session is verified.
   return (
     <div className="flex min-h-screen bg-gray-50 font-sans text-gray-900">
-      {/* SIDEBAR */}
+      {/* Navigation: Global drawer for role-specific routes and course list. */}
       <nav aria-label="Main Navigation">
         <Sidebar
           handleLogout={handleLogout}
@@ -105,7 +105,7 @@ function App() {
         />
       </nav>
 
-      {/* MAIN CONTENT AREA */}
+      {/* Workspace: Flexible area for rendering route-specific pages. */}
       <div className="flex-1 flex flex-col md:ml-64 transition-all duration-200">
         <header className="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-4 md:px-8 sticky top-0 z-10">
           <div className="flex items-center gap-3">

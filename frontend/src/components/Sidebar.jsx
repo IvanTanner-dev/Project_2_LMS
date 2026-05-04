@@ -8,18 +8,19 @@ const NAV_ITEMS = [
 
 const Sidebar = ({ handleLogout, courses, user, isOpen, setIsOpen }) => {
   const location = useLocation();
-  // Ensure we check for 'admin' role correctly.
-  // Often admins should also see teacher features.
+
+  // Identify administrative privileges to unlock system-wide management features.
   const isAdmin = user?.role === "admin" || user?.username === "admin";
   const isTeacher = user?.role === "teacher" || isAdmin;
 
-  // Auto-close on route change
+  // Enhance UX by automatically collapsing the mobile drawer upon navigation.
   useEffect(() => {
     if (setIsOpen) setIsOpen(false);
   }, [location.pathname, setIsOpen]);
 
   let currentNav = [...NAV_ITEMS];
-  // Add Teacher link if applicable
+
+  // Dynamically inject the Teacher Portal for authorized content creators.
   if (isTeacher) {
     currentNav.push({
       name: "Teacher Portal",
@@ -28,7 +29,7 @@ const Sidebar = ({ handleLogout, courses, user, isOpen, setIsOpen }) => {
     });
   }
 
-  // Add Admin link if applicable
+  // Expose sensitive system controls only to verified administrators.
   if (isAdmin) {
     currentNav.push({
       name: "Admin Panel",
@@ -37,7 +38,7 @@ const Sidebar = ({ handleLogout, courses, user, isOpen, setIsOpen }) => {
     });
   }
 
-  // 2. Calculate Global Progress (Average of all enrolled courses)
+  // Aggregate enrollment data to provide a high-level performance overview for the student.
   const enrolledCourses = courses.filter(
     (c) => c.progress_percentage !== undefined,
   );
@@ -104,7 +105,7 @@ const Sidebar = ({ handleLogout, courses, user, isOpen, setIsOpen }) => {
           })}
         </nav>
 
-        {/* GLOBAL PROGRESS WIDGET */}
+        {/* Gamification: Visualize overall curriculum mastery to encourage continued learning. */}
         <div className="mt-auto mb-6">
           <div className="bg-slate-800 border border-slate-600 rounded-2xl p-4">
             <div className="flex justify-between items-end mb-2">
