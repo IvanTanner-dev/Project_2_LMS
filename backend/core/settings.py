@@ -144,6 +144,29 @@ CORS_ALLOW_ALL_ORIGINS = (
     in ("1", "true", "yes", "on")
 )
 
+# CSRF Trusted Origins for Railway deployment
+CSRF_TRUSTED_ORIGINS = _env_csv(
+    "CSRF_TRUSTED_ORIGINS",
+    default=[
+        "http://localhost:5173",
+        "http://127.0.0.1:5173",
+        "https://education-management-platform-frontend-production-88fa.up.railway.app",
+    ],
+)
+
+# Add https support for trusted origins if they look like railway domains
+if os.environ.get("RAILWAY_STATIC_URL"):
+    railway_url = f"https://{os.environ.get('RAILWAY_STATIC_URL')}"
+    if railway_url not in CSRF_TRUSTED_ORIGINS:
+        CSRF_TRUSTED_ORIGINS.append(railway_url)
+
+# Security settings for production
+if not DEBUG:
+    CSRF_COOKIE_SECURE = True
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SAMESITE = 'None'  # Required for cross-site CSRF
+    SESSION_COOKIE_SAMESITE = 'None'
+
 # Where to go after a successful login
 LOGIN_REDIRECT_URL = '/api/courses/'
 
@@ -157,6 +180,11 @@ CORS_ALLOWED_ORIGINS = _env_csv(
         "http://127.0.0.1:5173",
     ],
 )
+
+# Sync CORS with CSRF origins for consistency
+for origin in CSRF_TRUSTED_ORIGINS:
+    if origin not in CORS_ALLOWED_ORIGINS:
+        CORS_ALLOWED_ORIGINS.append(origin)
 
 # Django REST Framework Settings
 REST_FRAMEWORK = {

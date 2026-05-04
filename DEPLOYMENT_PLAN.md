@@ -54,9 +54,8 @@ Successfully restored LMS to fully functional state after production deployment 
    ```
 
 2. **Platform Selection**
-   - **Frontend:** Vercel (recommended for React apps)
-   - **Backend:** Render (recommended for Django APIs)
-   - **Database:** PostgreSQL (production-grade)
+   - **Full Stack:** Railway (recommended for combined Backend/Frontend or separate services)
+   - **Database:** PostgreSQL (provisioned by Railway)
 
 3. **Deployment Configuration**
    - Update CORS settings for production domains
