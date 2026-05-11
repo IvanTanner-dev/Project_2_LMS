@@ -60,6 +60,8 @@ Successfully restored LMS to fully functional state after production deployment 
 3. **Deployment Configuration**
    - **Frontend Variable:** Set `VITE_API_URL` to your Backend Railway URL (e.g., `https://backend-production.up.railway.app`)
    - **Backend Variable:** Set `CSRF_TRUSTED_ORIGINS` and `CORS_ALLOWED_ORIGINS` to your Frontend Railway URL.
+   - **Pre-deploy Command:** Use `python manage.py migrate`. (Standard idempotent update).
+   - **Data Import:** If needed, run `python manage.py loaddata all_data_complete.json` manually via a one-time command to populate users and curriculum.
    - Update CORS settings for production domains
    - Configure environment variables for production
    - Set up SSL certificates

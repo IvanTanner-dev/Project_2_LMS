@@ -1,5 +1,7 @@
 # LMS PRO - Professional Learning Management System
 
+**[Live Demo](https://education-management-platform-frontend-production-88fa.up.railway.app/)**
+
 [![Status](https://img.shields.io/badge/Status-Deployment--Ready-success)](#)
 [![Tech Stack](https://img.shields.io/badge/Stack-React%20%7C%20Django%20%7C%20PostgreSQL-blue)](#)
 
@@ -7,11 +9,12 @@ A sophisticated, full-stack educational platform demonstrating advanced software
 
 ## **Demo Credentials**
 
-| Role        | Username       | Password          | Key Features                                   |
-| :---------- | :------------- | :---------------- | :--------------------------------------------- |
-| **Admin**   | `superadmin`   | `Admin123!`       | Full system control, User management           |
-| **Teacher** | `teacher_ivan` | `LmsPassword123!` | Course creation, Analytics, Content management |
-| **Student** | `student_one`  | `LmsGuest123!`    | Enrollment, Progress tracking, Flashcards      |
+| Role        | Username       | Password       | Key Features                                   |
+| :---------- | :------------- | :------------- | :--------------------------------------------- |
+| **Teacher** | `demo_teacher` | `P@ssw0rd123!` | Course creation, Analytics, Content management |
+| **Student** | `demo_student` | `P@ssw0rd456!` | Enrollment, Progress tracking, Flashcards      |
+
+> **Note:** For security, administrative access is restricted. To request a full administrative walkthrough, please contact the developer.
 
 ---
 
@@ -44,40 +47,148 @@ _User management and system administration_
 
 ---
 
-## **Technical Architecture**
+## **Wireframes & UX Planning**
 
-### **Frontend: React.js**
+Before implementation, the platform's user journey and layout were meticulously planned using **Excalidraw**. This ensured a content-first approach and a modular UI architecture.
 
-- **Vite & React 18:** Modern functional components and optimized build pipeline.
-- **Tailwind CSS:** Responsive, mobile-first professional UI.
-- **Axios & JWT Interceptors:** Secure, automated token management for API requests.
-- **RBAC Rendering:** Conditional UI components based on user role-permissions.
+### **Login & Identity**
 
-### **Backend: Django REST Framework**
+![Login Wireframe](docs/wireframes/Login.png)
 
-- **API Design:** RESTful ViewSet architecture for scalable endpoints.
-- **PostgreSQL/SQLite:** Optimized data models utilizing `select_related` and `prefetch_related`.
-- **Security:** Secure password hashing and SimpleJWT token rotation.
-- **CORS Management:** Hardened cross-origin configuration for frontend-backend integration.
+### **Student Dashboard**
 
-### **Key Features Implemented**
+![Dashboard Wireframe](docs/wireframes/Student%20Dashboard%20WF.png)
 
-- **Multi-role authentication system** with secure JWT tokens
-- **Dynamic sidebar navigation** based on user roles
-- **Course management** with enrollment tracking
-- **Progress tracking** and completion analytics
-- **Admin panel** for user and system management
-- **Responsive design** optimized for all devices
+### **Instructor Content Creation**
+
+![Create Course Wireframe](docs/wireframes/Teacher%20Create%20Course.png)
+
+### **Course & Lesson View**
+
+![Course View Wireframe](docs/wireframes/Course%20View.png)
 
 ---
 
-## ** Performance & Quality**
+## **Core Functionality & Role-Based Access**
 
-- **Lighthouse Scores:** - **Best Practices:** 100/100
-  - **Accessibility:** 93/100
-  - **SEO:** 91/100
-- **Automated Testing:** 22/22 Passing (Validated RBAC, API handshakes, and data consistency).
-- **Optimizations:** Implemented lazy loading for code splitting and response caching for high-traffic endpoints.
+### **For Students**
+
+- **Browse Catalog**: Discover and enroll in available math courses.
+- **My Learning**: Access a personalized dashboard of enrolled courses.
+- **Progress Tracking**: Real-time tracking of lesson completion.
+- **Certification**: Generate completion certificates upon finishing a course.
+
+### **For Teachers**
+
+- **Instructor Portal**: Create and manage course content and lessons.
+- **Analytics Dashboard**: Monitor student enrollment and overall progress.
+- **Content Management**: Dynamic tools for lesson architecture and sequencing.
+
+### **For Administrators**
+
+- **User Management**: Oversight of user accounts and role assignments.
+- **System Control**: Full management of courses and platform configurations.
+
+---
+
+## **Technology Stack & Dependencies**
+
+### **Frontend: React Ecosystem**
+
+- **[React 19](https://react.dev/):** UI library for building modular, functional components.
+- **[Vite 7](https://vitejs.dev/):** High-performance frontend build tool.
+- **[Tailwind CSS 4](https://tailwindcss.com/):** Utility-first CSS framework for professional styling.
+- **[Axios](https://axios-http.com/):** Promise-based HTTP client for API communication.
+- **[React Router 7](https://reactrouter.com/):** Declarative routing for SPA navigation.
+- **[Recharts](https://recharts.org/):** Composable charting library for analytics.
+- **[Lucide React](https://lucide.dev/):** Professional icon set.
+
+### **Backend: Django REST Framework**
+
+- **[Django 6](https://www.djangoproject.com/):** High-level Python web framework.
+- **[Django REST Framework](https://www.django-rest-framework.org/):** Toolkit for building Web APIs.
+- **[SimpleJWT](https://django-rest-framework-simplejwt.readthedocs.io/):** JWT authentication for secure sessions.
+- **[WhiteNoise](http://whitenoise.evans.io/):** Efficient static file serving for production.
+- **[Psycopg2](https://www.psycopg.org/):** PostgreSQL adapter for Python.
+
+### **Infrastructure & Deployment**
+
+- **[Railway](https://railway.app/):** Cloud platform for infrastructure management.
+- **[PostgreSQL](https://www.postgresql.org/):** Advanced relational database.
+
+---
+
+## **Technical Architecture**
+
+### **System Workflow**
+
+1. **Authentication**: Users authenticate via the React frontend. The backend validates credentials and issues a **JWT (JSON Web Token)**.
+2. **API Requests**: The frontend stores the token and includes it in the `Authorization` header for all subsequent API calls using **Axios Interceptors**.
+3. **Role-Based Logic**: The Django backend checks the user's `Profile` role before granting access to specific endpoints or data.
+4. **State Management**: React's `useEffect` and `useState` hooks keep the local UI in sync with the database.
+
+---
+
+## **Local Setup & Installation**
+
+### **Prerequisites**
+
+- Python 3.13+
+- Node.js 20+
+- Git
+
+### **Backend Setup**
+
+1. Navigate to the backend directory: `cd backend`
+2. Create and activate a virtual environment:
+   - Windows: `python -m venv venv` then `venv\Scripts\activate`
+   - Mac/Linux: `python -m venv venv` then `source venv/bin/activate`
+3. Install dependencies: `pip install -r requirements.txt`
+4. Initialize database: `python manage.py migrate`
+5. Import demo data: `python manage.py loaddata all_data_complete.json`
+6. Run server: `python manage.py runserver`
+
+### **Frontend Setup**
+
+1. Navigate to the frontend directory: `cd frontend`
+2. Install dependencies: `npm install`
+3. Run development server: `npm run dev`
+4. Access the app at: `http://localhost:5173`
+
+---
+
+## **Running Tests**
+
+### **Backend (Django)**
+
+Run integration and API tests:
+
+```bash
+cd backend
+python manage.py test
+```
+
+### **Frontend (Vitest)**
+
+Run component and unit tests:
+
+```bash
+cd frontend
+npm test
+```
+
+---
+
+## **Performance & Quality**
+
+- **Lighthouse Scores**:
+  - **Best Practices**: 100/100
+  - **Accessibility**: 93/100
+  - **SEO**: 91/100
+- **Automated Testing**: 22/22 Passing (Validated RBAC, API handshakes, and data consistency).
+- **Optimizations**: Implemented lazy loading for code splitting and response caching.
+
+---
 
 ## **Project Structure**
 
@@ -92,126 +203,24 @@ Project_2_LMS/
 │   │   ├── components/     # Reusable UI components
 │   │   ├── pages/         # Route-based page components
 │   │   └── api.js         # Axios configuration
-│   └── public/            # Static assets
-└── docs/                  # Documentation
-    └── screenshots/       # UI screenshots
+└── docs/                  # Documentation & Planning
+    ├── screenshots/       # UI Implementation Captures
+    └── wireframes/        # UX/UI Planning (Excalidraw)
 ```
-
----
-
-## **Core Functionality**
-
-### **For Students**
-
-- Browse and enroll in available courses
-- Track learning progress and completion status
-- Generate completion certificates
-- Personalized dashboard with enrolled courses
-
-### **For Teachers**
-
-- Create and manage course content
-- Monitor student enrollment and progress
-- Access course analytics and insights
-- Manage lesson materials and resources
-
-### **For Administrators**
-
-- User account management and role assignment
-- System-wide analytics and reporting
-- Course and content oversight
-- Platform configuration and maintenance
-
----
-
-## **Getting Started**
-
-### **Prerequisites**
-
-- Python 3.8+ and Node.js 16+
-- Git for version control
-
-### **Backend Setup**
-
-```bash
-cd backend
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
-pip install -r requirements.txt
-python manage.py migrate
-python manage.py runserver
-```
-
-### **Frontend Setup**
-
-```bash
-cd frontend
-npm install
-npm run dev
-```
-
-### **Access the Application**
-
-- Frontend: http://localhost:5173
-- Backend API: http://localhost:8000/api/
-- Django Admin: http://localhost:8000/admin/
-
----
-
-## **Production Deployment (Railway.app)**
-
-This project is configured for automated deployment via Railway. Follow these steps to move from local development to production.
-
-### **1. Backend Deployment (Django)**
-
-1. **Connect Repository:** Link your GitHub repo to a new Railway project.
-2. **Database Setup:** Add a **PostgreSQL** database to your Railway project.
-3. **Environment Variables:**
-   - `DEBUG`: `False`
-   - `SECRET_KEY`: (Generate a long random string)
-   - `ALLOWED_HOSTS`: `*` (or your specific domain)
-   - `CORS_ALLOWED_ORIGINS`: `https://your-frontend-domain.up.railway.app`
-   - `DATABASE_URL`: (Automatically provided by Railway's PostgreSQL)
-4. **Build & Start:** Railway will detect the `backend/Procfile` and use it to start the Gunicorn server.
-
-### **2. Frontend Deployment (Vite/React)**
-
-1. **New Service:** Create a new service in the same Railway project.
-2. **Root Directory:** Set the root directory to `frontend/`.
-3. **Environment Variables:**
-   - `VITE_API_BASE_URL`: `https://your-backend-domain.up.railway.app`
-4. **Build Command:** `npm run build`
-5. **Install Command:** `npm install`
-6. **Publish Directory:** `dist`
-
----
-
-## **Future Enhancements**
-
-- **Real-time Notifications** with WebSocket integration
-- **Video Streaming** capabilities for course content
-- **Payment Processing** integration for premium courses
-- **Advanced Analytics** with data visualization
-- **Mobile Application** development (React Native)
 
 ---
 
 ## **Technical Challenges Solved**
 
-1. **JWT Token Management** - Implemented secure token refresh mechanism
-2. **Role-based UI Rendering** - Dynamic component display based on user permissions
-3. **State Management** - Efficient React state handling for complex user interactions
-4. **API Design** - RESTful API architecture with proper error handling
-5. **Database Schema** - Optimized relational model for educational data
+1. **JWT Token Management**: Implemented secure token refresh mechanism.
+2. **Role-based UI Rendering**: Dynamic component display based on user permissions.
+3. **Database Schema**: Optimized relational model for educational data.
+4. **API Security**: Hardened CORS and CSRF configurations for cross-domain production environments.
 
 ---
 
-## **Contact & Portfolio**
-
-This project demonstrates full-stack development capabilities with modern web technologies. For more projects or collaboration opportunities, please connect through professional platforms.
-
-**Technologies Highlighted:** React.js, Django, REST APIs, JWT Authentication, Role-based Systems, Responsive Design, Database Design, API Integration
-
-## About the Developer
+## **About the Developer**
 
 After a decade-long career in mathematics, I transitioned into software engineering to apply my expertise in logic and system architecture to building high-performance web applications. I specialize in the React/Django ecosystem with a focus on Test-Driven Development (TDD).
+
+**Contact**: Connect through professional platforms for collaboration opportunities.
